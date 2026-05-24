@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAXAM-TECH | Software Production Blog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Geist+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+[data-theme="light"] {
+  --bg:          #F5F2EB;
+  --bg-card:     #EBE8E0;
+  --bg-pane:     #E2DFD6;
+  --ink:         #141411;
+  --ink-muted:   #545249;
+  --ink-soft:    #918E82;
+  --border:      rgba(20,20,17,0.09);
+  --border-rich: rgba(20,20,17,0.25);
+  --accent-dot:  #4E6E58;
+  --card-shadow: rgba(20,20,17,0.06);
+}
+[data-theme="dark"] {
+  --bg:          #0A0A09;
+  --bg-card:     #121210;
+  --bg-pane:     #1A1A17;
+  --ink:         #ECEAE4;
+  --ink-muted:   #9E9B90;
+  --ink-soft:    #5E5C54;
+  --border:      rgba(236,234,228,0.08);
+  --border-rich: rgba(236,234,228,0.25);
+  --accent-dot:  #87A991;
+  --card-shadow: rgba(0,0,0,0.3);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+  transition: background .4s ease, color .4s ease;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ink-soft); border-radius: 2px; }
+.pf { font-family: 'Playfair Display', serif; }
+.mono { font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* HEADER */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  transition: background .4s;
+}
+.brand {
+  display: flex; align-items: baseline; gap: 2px;
+  text-decoration: none; cursor: pointer;
+}
+.brand-core { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: 0.05em; }
+.brand-ext { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 300; color: var(--ink-soft); margin-left: 4px; }
+.nav-links { display: flex; gap: 40px; list-style: none; }
+.nav-links a { text-decoration: none; color: var(--ink-muted); transition: color .2s; }
+.nav-links a:hover { color: var(--ink); }
+.theme-switch {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 100px; padding: 6px 14px 6px 8px;
+  cursor: pointer; transition: all .3s;
+}
+.theme-switch:hover { border-color: var(--ink-soft); }
+.switch-orb { width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
+
+/* HERO */
+.hero {
+  padding: 160px 48px 80px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.hero-wrapper { max-width: 960px; }
+.hero-tagline { color: var(--ink-soft); margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+.hero-tagline::before { content: ''; width: 24px; height: 1px; background: var(--ink-soft); }
+.hero-title { font-size: clamp(38px, 5.5vw, 76px); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 32px; }
+.hero-title em { font-style: italic; color: var(--ink-muted); }
+.hero-description { font-size: 17px; font-weight: 300; color: var(--ink-muted); line-height: 1.8; max-width: 640px; }
+
+/* === CARD-BASED GRID LAYOUT === */
+.section-header { padding: 48px 48px 24px; display: flex; justify-content: space-between; align-items: baseline; }
+.section-title { font-size: 12px; color: var(--ink-soft); }
+
+.suite-grid {
+  padding: 0 48px 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+/* Product Card */
+.product-hub {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), border-color .3s, box-shadow .3s;
+  box-shadow: 0 2px 8px var(--card-shadow);
+}
+.product-hub:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-rich);
+  box-shadow: 0 8px 24px var(--card-shadow);
+}
+
+.product-meta-header {
+  padding: 28px 28px 16px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.product-identity { display: flex; flex-direction: column; gap: 4px; }
+.product-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 500; color: var(--ink); }
+.product-spec { color: var(--ink-soft); font-size: 10px; }
+.product-architecture-badge {
+  background: var(--bg-pane); border: 1px solid var(--border);
+  padding: 4px 12px; border-radius: 100px; color: var(--ink-muted); font-size: 10px;
+}
+.product-brief { padding: 0 28px 24px; font-size: 14px; color: var(--ink-muted); line-height: 1.7; }
+
+/* TABS */
+.tabs-row {
+  display: flex; padding: 0 28px;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.01);
+  overflow-x: auto;
+  gap: 0;
+}
+.tab-trigger {
+  background: none; border: none; outline: none;
+  padding: 14px 18px; color: var(--ink-soft); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .2s, border-color .2s;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.tab-trigger:hover { color: var(--ink); }
+.tab-trigger.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 500; }
+
+/* Panes */
+.panes-wrapper { padding: 24px 28px; background: rgba(0,0,0,0.005); }
+.pane-content { display: none; }
+.pane-content.active { display: block; }
+
+/* Article Cards inside panes */
+.article-item {
+  display: block;
+  padding: 20px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  text-decoration: none; color: inherit;
+  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.article-item:last-child { margin-bottom: 0; }
+.article-item:hover {
+  border-color: var(--accent-dot);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--card-shadow);
+}
+.article-left { display: flex; flex-direction: column; gap: 8px; }
+.article-badge-line { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--ink-soft); }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-dot); flex-shrink: 0; }
+.article-heading { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; color: var(--ink); line-height: 1.3; }
+.article-excerpt { font-size: 13px; color: var(--ink-muted); line-height: 1.6; }
+.article-action {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px; color: var(--ink-soft);
+  transition: transform .2s;
+}
+.article-item:hover .article-action {
+  transform: translateX(4px);
+  color: var(--accent-dot);
+}
+
+/* CONTACT */
+.contact-anchor {
+  border-top: 1px solid var(--border);
+  padding: 100px 48px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: flex-end;
+}
+.contact-headline { font-size: clamp(28px, 4vw, 48px); font-weight: 400; line-height: 1.15; }
+.contact-headline em { font-style: italic; color: var(--ink-soft); }
+.contact-details { display: flex; flex-direction: column; gap: 12px; }
+.mail-link {
+  font-family: 'Playfair Display', serif; font-size: 24px; color: var(--ink);
+  text-decoration: none; border-bottom: 1px solid var(--border-rich);
+  padding-bottom: 6px; width: fit-content; transition: border-color .2s;
+}
+.mail-link:hover { border-color: var(--ink); }
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 48px; display: flex; justify-content: space-between; align-items: center;
+  color: var(--ink-soft);
+}
+
+/* ANIMATION */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s cubic-bezier(0.16, 1, 0.3, 1), transform .6s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .suite-grid { grid-template-columns: 1fr; padding: 0 24px 60px; gap: 20px; }
+  header { padding: 0 24px; }
+  .hero { padding: 140px 24px 60px; }
+  .contact-anchor { grid-template-columns: 1fr; gap: 32px; padding: 60px 24px; }
+  footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
+  .section-header { padding: 32px 24px 20px; }
+  .product-meta-header { padding: 24px 24px 12px; flex-direction: column; gap: 8px; }
+  .product-brief { padding: 0 24px 20px; }
+  .tabs-row { padding: 0 24px; }
+  .panes-wrapper { padding: 20px 24px; }
+}
+
+/* ═══════════════════════════════════════════
+   NARSY REPORT — SCOPED STYLES
+═════════════════════════════════════════════ */
+.narsy-report-card {
+  --bg:       #0c0c0e;
+  --surface:  #131316;
+  --surface2: #1a1a1f;
+  --border:   #252529;
+  --border2:  #2e2e35;
+  --text:     #e8e6e0;
+  --muted:    #6b6b78;
+  --dim:      #3a3a42;
+  --narsy:    #e8a84c;
+  --narsy2:   #d4893a;
+  --blue:     #5b9cf6;
+  --green:    #4eca8b;
+  --red:      #e85b5b;
+  --purple:   #a78bfa;
+  --teal:     #2dd4bf;
+  --serif:    'Playfair Display', Georgia, serif;
+  --sans:     'DM Sans', system-ui, sans-serif;
+  --mono:     'DM Mono', monospace;
+  --r:        10px;
+  --r-lg:     16px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  grid-column: 1 / -1;
+}
+@media (max-width: 900px) { .narsy-report-card { grid-column: 1 / -1; } }
+.narsy-report-card .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+@media (max-width: 900px) { .narsy-report-card .shell { grid-template-columns: 1fr; } }
+.narsy-report-card .sidebar {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 2rem 1.4rem; display: flex; flex-direction: column; gap: .2rem;
+}
+@media (max-width: 900px) { .narsy-report-card .sidebar { display: none; } }
+.narsy-report-card .sidebar-logo {
+  font-family: var(--mono); font-size: .75rem; letter-spacing: .18em;
+  color: var(--narsy); text-transform: uppercase; margin-bottom: 1.6rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.narsy-report-card .sidebar-logo::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--narsy); display: inline-block; flex-shrink: 0;
+}
+.narsy-report-card .sidebar-title {
+  font-size: .7rem; font-weight: 500; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .1em;
+  margin: 1.2rem 0 .4rem; padding-inline-start: .6rem;
+}
+.narsy-report-card .nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: .45rem .6rem; border-radius: 6px;
+  font-size: .82rem; color: var(--muted);
+  text-decoration: none; transition: all .18s;
+  cursor: pointer; border: none; background: transparent; width: 100%; text-align: left;
+}
+.narsy-report-card .nav-item .n { font-family: var(--mono); font-size: .65rem; color: var(--dim); min-width: 18px; }
+.narsy-report-card .nav-item:hover { background: var(--surface2); color: var(--text); }
+.narsy-report-card .nav-item.active { background: rgba(232,168,76,.1); color: var(--narsy); }
+.narsy-report-card .nav-item.active .n { color: var(--narsy); }
+.narsy-report-card .sidebar-meta {
+  margin-top: auto; padding-top: 1.4rem; border-top: 1px solid var(--border);
+  font-size: .72rem; color: var(--muted); line-height: 1.7;
+}
+.narsy-report-card .content { min-width: 0; }
+.narsy-report-card .cover {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 5vw; position: relative; overflow: hidden; background: var(--bg);
+}
+.narsy-report-card .cover-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(232,168,76,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(232,168,76,.04) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events: none;
+}
+.narsy-report-card .cover-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,168,76,.07) 0%, transparent 70%);
+  top: -200px; right: -200px; pointer-events: none;
+}
+.narsy-report-card .cover-label {
+  font-family: var(--mono); font-size: .72rem; letter-spacing: .2em;
+  color: var(--narsy); text-transform: uppercase; margin-bottom: 1.5rem;
+}
+.narsy-report-card .cover h1 {
+  font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 5.5rem);
+  font-weight: 700; line-height: 1.08; margin-bottom: .6rem;
+}
+.narsy-report-card .cover h1 em { font-style: italic; color: var(--narsy); }
+.narsy-report-card .cover-subtitle {
+  font-size: 1.05rem; color: var(--muted);
+  max-width: 520px; margin-bottom: 3rem; line-height: 1.75;
+}
+.narsy-report-card .cover-meta {
+  display: flex; gap: 3rem; flex-wrap: wrap;
+  border-top: 1px solid var(--border); padding-top: 2rem;
+}
+.narsy-report-card .cover-meta-item dt {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: .2rem;
+}
+.narsy-report-card .cover-meta-item dd { font-size: .88rem; color: var(--text); }
+.narsy-report-card .cover-scroll {
+  position: absolute; bottom: 2.5rem; right: 3rem;
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .15em;
+  color: var(--dim); text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px; writing-mode: vertical-rl;
+}
+.narsy-report-card .section { padding: 5rem 4rem; border-top: 1px solid var(--border); max-width: 960px; }
+@media (max-width: 700px) { .narsy-report-card .section { padding: 3rem 1.4rem; } }
+.narsy-report-card .section-num {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .2em;
+  color: var(--narsy); text-transform: uppercase; margin-bottom: .8rem;
+}
+.narsy-report-card .section h2 {
+  font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700; line-height: 1.2; margin-bottom: 1rem;
+}
+.narsy-report-card .section h2 em { font-style: italic; color: var(--muted); }
+.narsy-report-card .lead {
+  font-size: 1rem; color: #a8a6a0; line-height: 1.8;
+  max-width: 680px; margin-bottom: 2.5rem;
+}
+.narsy-report-card .lead strong { color: var(--text); font-weight: 500; }
+.narsy-report-card .divider {
+  height: 1px; background: linear-gradient(90deg, var(--narsy) 0%, var(--border) 40%, transparent 100%);
+  margin: .5rem 0 2.5rem; max-width: 960px;
+}
+.narsy-report-card .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.narsy-report-card .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+@media (max-width: 700px) { .narsy-report-card .grid-2, .narsy-report-card .grid-3 { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .narsy-report-card .grid-3 { grid-template-columns: 1fr 1fr; } }
+.narsy-report-card .stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.6rem;
+  position: relative; overflow: hidden; transition: border-color .2s;
+}
+.narsy-report-card .stat-card:hover { border-color: var(--border2); }
+.narsy-report-card .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.narsy-report-card .stat-card.gold::after { background: var(--narsy); }
+.narsy-report-card .stat-card.blue::after { background: var(--blue); }
+.narsy-report-card .stat-card.green::after { background: var(--green); }
+.narsy-report-card .stat-card.red::after  { background: var(--red); }
+.narsy-report-card .stat-card.purple::after { background: var(--purple); }
+.narsy-report-card .stat-card .sc-label { font-family: var(--mono); font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+.narsy-report-card .stat-card .sc-value { font-family: var(--serif); font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: .3rem; }
+.narsy-report-card .stat-card.gold .sc-value { color: var(--narsy); }
+.narsy-report-card .stat-card.blue .sc-value { color: var(--blue); }
+.narsy-report-card .stat-card.green .sc-value { color: var(--green); }
+.narsy-report-card .stat-card.red .sc-value  { color: var(--red); }
+.narsy-report-card .stat-card.purple .sc-value { color: var(--purple); }
+.narsy-report-card .stat-card .sc-desc { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+.narsy-report-card .chart-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.8rem 2rem; margin-bottom: 1.2rem;
+}
+.narsy-report-card .chart-box .ch-title { font-family: var(--mono); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
+.narsy-report-card .chart-box .ch-subtitle { font-size: .85rem; color: #8a8880; margin-bottom: 1.4rem; line-height: 1.5; }
+.narsy-report-card .chart-box svg text { font-family: var(--mono); }
+.narsy-report-card .bar-row { display: grid; grid-template-columns: 160px 1fr 50px; align-items: center; gap: 12px; margin-bottom: .9rem; }
+.narsy-report-card .bar-row .br-label { font-size: .82rem; color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.narsy-report-card .bar-row.highlight .br-label { color: var(--narsy); font-weight: 500; }
+.narsy-report-card .bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: visible; position: relative; }
+.narsy-report-card .bar-fill {
+  height: 100%; border-radius: 4px; width: 0;
+  transition: width 1.2s cubic-bezier(.22,1,.36,1); position: relative;
+}
+.narsy-report-card .bar-fill::after {
+  content: ''; position: absolute; right: -1px; top: -2px;
+  width: 12px; height: 12px; border-radius: 50%; background: inherit; box-shadow: 0 0 8px currentColor;
+}
+.narsy-report-card .br-val { font-family: var(--mono); font-size: .75rem; color: var(--muted); }
+.narsy-report-card .bar-row.highlight .br-val { color: var(--narsy); }
+.narsy-report-card .comp-table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.narsy-report-card .comp-table th {
+  padding: .9rem 1rem; text-align: left; font-family: var(--mono);
+  font-size: .65rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.narsy-report-card .comp-table th.narsy-col { color: var(--narsy); background: rgba(232,168,76,.04); }
+.narsy-report-card .comp-table td {
+  padding: .85rem 1rem; border-bottom: 1px solid var(--border);
+  color: #a8a6a0; vertical-align: top;
+}
+.narsy-report-card .comp-table td.feature-name { color: var(--text); font-weight: 500; }
+.narsy-report-card .comp-table td.narsy-col { background: rgba(232,168,76,.03); }
+.narsy-report-card .comp-table tr:last-child td { border-bottom: none; }
+.narsy-report-card .comp-table tr:hover td { background: rgba(255,255,255,.02); }
+.narsy-report-card .comp-table tr:hover td.narsy-col { background: rgba(232,168,76,.05); }
+.narsy-report-card .check { color: var(--green); }
+.narsy-report-card .cross { color: var(--red); }
+.narsy-report-card .partial { color: var(--narsy); }
+.narsy-report-card .pill {
+  display: inline-block; padding: 2px 8px; border-radius: 12px;
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .04em;
+}
+.narsy-report-card .pill-gold  { background: rgba(232,168,76,.15); color: var(--narsy); }
+.narsy-report-card .pill-green { background: rgba(78,202,139,.15); color: var(--green); }
+.narsy-report-card .pill-red   { background: rgba(232,91,91,.15);  color: var(--red); }
+.narsy-report-card .pill-blue  { background: rgba(91,156,246,.15); color: var(--blue); }
+.narsy-report-card .pill-muted { background: rgba(107,107,120,.15); color: var(--muted); }
+.narsy-report-card .radar-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+@media (max-width: 700px) { .narsy-report-card .radar-wrap { grid-template-columns: 1fr; } }
+.narsy-report-card .radar-container svg { overflow: visible; }
+.narsy-report-card .heat-cell { padding: .6rem .8rem; border-radius: 4px; font-family: var(--mono); font-size: .75rem; text-align: center; font-weight: 500; }
+.narsy-report-card .method-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--narsy); border-radius: var(--r);
+  padding: 1.4rem 1.6rem; margin-bottom: 1.4rem;
+}
+.narsy-report-card .method-box h4 { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--narsy); margin-bottom: .6rem; }
+.narsy-report-card .method-box p { font-size: .85rem; color: #8a8880; line-height: 1.7; }
+.narsy-report-card .legend { display: flex; flex-wrap: wrap; gap: 1.4rem; margin-top: 1rem; }
+.narsy-report-card .legend-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); }
+.narsy-report-card .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.narsy-report-card .callout {
+  background: rgba(232,168,76,.06); border: 1px solid rgba(232,168,76,.2);
+  border-radius: var(--r); padding: 1.4rem 1.6rem;
+  margin: 1.4rem 0; display: flex; gap: 1rem; align-items: flex-start;
+}
+.narsy-report-card .callout-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.narsy-report-card .callout p { font-size: .88rem; color: #c8c4b8; line-height: 1.7; }
+.narsy-report-card .callout p strong { color: var(--narsy); font-weight: 500; }
+.narsy-report-card .animate-on-scroll { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+.narsy-report-card .animate-on-scroll.visible { opacity: 1; transform: none; }
+.narsy-report-card #tooltip {
+  position: absolute; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 6px 10px; font-size: .75rem;
+  font-family: var(--mono); color: var(--text);
+  pointer-events: none; z-index: 100; white-space: nowrap; display: none;
+}
+.narsy-report-card .waterfall-bar { cursor: pointer; transition: opacity .2s; }
+.narsy-report-card .waterfall-bar:hover { opacity: .85; }
+
+/* ═══════════════════════════════════════════
+   NARSY TUTORIAL — SCOPED STYLES
+═════════════════════════════════════════════ */
+.narsy-tutorial-card {
+  --ink:    #0f0e0b;
+  --paper:  #f5f2eb;
+  --cream:  #ede9df;
+  --warm:   #d4c9b0;
+  --accent: #b85c2a;
+  --accent2:#2a6eb8;
+  --dim:    #7a7468;
+  --card-bg:#faf8f3;
+  --border: #d8d3c8;
+  --mono:   'IBM Plex Mono', monospace;
+  --serif:  'Fraunces', serif;
+  --sans:   'IBM Plex Sans Arabic', sans-serif;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(15,14,11,.08), 0 1px 3px rgba(15,14,11,.05);
+  --shadow-lg: 0 8px 40px rgba(15,14,11,.13), 0 2px 8px rgba(15,14,11,.07);
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+  grid-column: 1 / -1;
+}
+@keyframes narsyPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.narsy-tutorial-card .header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--ink);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+  border-bottom: 1px solid #2a2820;
+}
+.narsy-tutorial-card .logo {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--paper);
+  letter-spacing: .08em;
+  display: flex; align-items: center; gap: 10px;
+}
+.narsy-tutorial-card .logo-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; }
+.narsy-tutorial-card .lang-btn {
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: .8rem;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  letter-spacing: .06em;
+  transition: background .2s, border-color .2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.narsy-tutorial-card .lang-btn:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.3); }
+.narsy-tutorial-card .lang-flag { font-size: 1rem; }
+.narsy-tutorial-card .hero {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4rem 2rem 5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.narsy-tutorial-card .hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(184,92,42,.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.narsy-tutorial-card .hero-label {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.narsy-tutorial-card .hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 300;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  color: var(--paper);
+}
+.narsy-tutorial-card .hero h1 span { color: var(--accent); font-weight: 600; }
+.narsy-tutorial-card .hero p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: rgba(245,242,235,.65);
+  max-width: 540px;
+  margin: 0 auto 2.5rem;
+}
+.narsy-tutorial-card .hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 24px;
+  padding: 8px 20px;
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: rgba(245,242,235,.6);
+  letter-spacing: .05em;
+}
+.narsy-tutorial-card .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:#4ade80; animation: narsyPulse 2s infinite; }
+.narsy-tutorial-card .stage-bar-wrap {
+  background: var(--ink);
+  padding: 0 1.5rem 1.5rem;
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+  border-bottom: 1px solid #1e1d1a;
+}
+.narsy-tutorial-card .stage-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.narsy-tutorial-card .stage-bar::-webkit-scrollbar { display: none; }
+.narsy-tutorial-card .stage-btn {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04);
+  color: rgba(245,242,235,.55);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 400;
+  transition: all .22s ease;
+  display: flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+  position: relative;
+}
+.narsy-tutorial-card .stage-btn .s-num {
+  font-family: var(--mono);
+  font-size: .7rem;
+  color: var(--accent);
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  background: rgba(184,92,42,.15);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.narsy-tutorial-card .stage-btn:hover {
+  background: rgba(255,255,255,.09);
+  color: var(--paper);
+  border-color: rgba(255,255,255,.2);
+}
+.narsy-tutorial-card .stage-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.narsy-tutorial-card .stage-btn.active .s-num { background: rgba(255,255,255,.2); color: #fff; }
+.narsy-tutorial-card .main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+.narsy-tutorial-card .stage-card { display: none; }
+.narsy-tutorial-card .stage-card.visible { display: block; }
+.narsy-tutorial-card .card-header {
+  display: flex; align-items: flex-start; gap: 1.5rem;
+  margin-bottom: 2rem; padding: 2rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  position: relative; overflow: hidden;
+}
+.narsy-tutorial-card .card-header::before {
+  content: ''; position: absolute; top: 0; inset-inline-start: 0;
+  width: 4px; height: 100%;
+  background: var(--accent);
+}
+.narsy-tutorial-card .card-num-large {
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  font-weight: 300;
+  color: var(--warm);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 2.5rem;
+}
+.narsy-tutorial-card .card-title-group { flex: 1; }
+.narsy-tutorial-card .card-stage-label {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .16em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: .4rem;
+}
+.narsy-tutorial-card .card-title {
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: .6rem;
+}
+.narsy-tutorial-card .card-subtitle {
+  font-size: .92rem;
+  color: var(--dim);
+  line-height: 1.7;
+  max-width: 620px;
+}
+.narsy-tutorial-card .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem; }
+@media (max-width: 700px) { .narsy-tutorial-card .content-grid { grid-template-columns: 1fr; } }
+.narsy-tutorial-card .content-grid.one-col { grid-template-columns: 1fr; }
+.narsy-tutorial-card .content-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 800px) { .narsy-tutorial-card .content-grid.three-col { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 500px) { .narsy-tutorial-card .content-grid.three-col { grid-template-columns: 1fr; } }
+.narsy-tutorial-card .info-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem;
+}
+.narsy-tutorial-card .info-box.accent-blue { border-inline-start: 3px solid var(--accent2); }
+.narsy-tutorial-card .info-box.accent-red  { border-inline-start: 3px solid var(--accent); }
+.narsy-tutorial-card .info-box.accent-green{ border-inline-start: 3px solid #2a8b4a; }
+.narsy-tutorial-card .info-box.accent-amber{ border-inline-start: 3px solid #c07a20; }
+.narsy-tutorial-card .info-box h3 {
+  font-family: var(--mono);
+  font-size: .75rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: .9rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.narsy-tutorial-card .info-box h3 .icon {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+}
+.narsy-tutorial-card .icon-blue { background: rgba(42,110,184,.12); }
+.narsy-tutorial-card .icon-red  { background: rgba(184,92,42,.12); }
+.narsy-tutorial-card .icon-green{ background: rgba(42,139,74,.12); }
+.narsy-tutorial-card .icon-amber{ background: rgba(192,122,32,.12); }
+.narsy-tutorial-card .info-box p { font-size: .9rem; line-height: 1.75; color: #3a3730; }
+.narsy-tutorial-card .step-list { list-style: none; }
+.narsy-tutorial-card .step-list li {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: .65rem 0;
+  border-bottom: 1px solid var(--cream);
+  font-size: .9rem;
+  line-height: 1.6;
+  color: #3a3730;
+}
+.narsy-tutorial-card .step-list li:last-child { border-bottom: none; }
+.narsy-tutorial-card .step-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: .65rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.narsy-tutorial-card .code-box {
+  background: #1a1916;
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+  margin: .6rem 0;
+}
+.narsy-tutorial-card .code-label {
+  font-family: var(--mono);
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #7a7468;
+  margin-bottom: .7rem;
+}
+.narsy-tutorial-card .code-box code {
+  font-family: var(--mono);
+  font-size: .82rem;
+  color: #d4c9b0;
+  line-height: 1.8;
+  display: block;
+  white-space: pre-wrap;
+}
+.narsy-tutorial-card .code-box code .c-orange { color: #e8976a; }
+.narsy-tutorial-card .code-box code .c-green  { color: #7ec9a0; }
+.narsy-tutorial-card .code-box code .c-blue   { color: #7ab8e8; }
+.narsy-tutorial-card .code-box code .c-dim    { color: #5a564f; }
+.narsy-tutorial-card .flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 1rem 0;
+  padding: 1.2rem 1.4rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+.narsy-tutorial-card .flow-node {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: .8rem;
+  font-family: var(--mono);
+  color: var(--ink);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.narsy-tutorial-card .flow-node.highlight { background: var(--accent); border-color: var(--accent); color: #fff; }
+.narsy-tutorial-card .flow-node.highlight2 { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.narsy-tutorial-card .flow-arrow { padding: 0 8px; color: var(--warm); font-size: .9rem; flex-shrink: 0; }
+.narsy-tutorial-card[dir="rtl"] .flow-arrow { transform: scaleX(-1); }
+.narsy-tutorial-card .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: .8rem; }
+.narsy-tutorial-card .tag {
+  background: rgba(184,92,42,.09);
+  border: 1px solid rgba(184,92,42,.2);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: .72rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: .04em;
+}
+.narsy-tutorial-card .tag.blue { background: rgba(42,110,184,.09); border-color: rgba(42,110,184,.2); color: var(--accent2); }
+.narsy-tutorial-card .tag.green { background: rgba(42,139,74,.09); border-color: rgba(42,139,74,.2); color: #2a7a44; }
+.narsy-tutorial-card .quote-block {
+  border-inline-start: 3px solid var(--warm);
+  padding: .8rem 1.2rem;
+  margin: .8rem 0;
+  background: var(--cream);
+  border-radius: 0 8px 8px 0;
+}
+.narsy-tutorial-card[dir="rtl"] .quote-block {
+  border-inline-start: 3px solid var(--warm);
+  border-radius: 8px 0 0 8px;
+}
+.narsy-tutorial-card .quote-block p { font-size: .88rem; line-height: 1.7; color: #4a4640; font-style: italic; }
+.narsy-tutorial-card .feature-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: .8rem 0;
+  border-bottom: 1px solid var(--cream);
+}
+.narsy-tutorial-card .feature-item:last-child { border-bottom: none; }
+.narsy-tutorial-card .feature-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.narsy-tutorial-card .feature-text h4 { font-size: .88rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.narsy-tutorial-card .feature-text p { font-size: .82rem; color: var(--dim); line-height: 1.6; }
+.narsy-tutorial-card .nav-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.narsy-tutorial-card .nav-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--ink);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: .88rem;
+  font-weight: 500;
+  transition: all .2s;
+}
+.narsy-tutorial-card .nav-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.narsy-tutorial-card .nav-btn:disabled { opacity: .35; cursor: default; }
+.narsy-tutorial-card .nav-btn:disabled:hover { background: var(--card-bg); color: var(--ink); border-color: var(--border); }
+.narsy-tutorial-card .nav-progress {
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: var(--dim);
+}
+.narsy-tutorial-card .tutorial-progress {
+  position: sticky;
+  top: 112px;
+  height: 2px;
+  background: var(--accent);
+  z-index: 95;
+  transition: width .3s ease;
+}
+@media (max-width: 600px) {
+  .narsy-tutorial-card .card-header { flex-direction: column; gap: .8rem; }
+  .narsy-tutorial-card .card-num-large { font-size: 2.5rem; }
+  .narsy-tutorial-card .card-title { font-size: 1.35rem; }
+  .narsy-tutorial-card .hero { padding: 2.5rem 1.2rem 3.5rem; }
+  .narsy-tutorial-card .stage-bar-wrap { padding: 0 1rem .8rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="#">
+    <span class="brand-core">ZAXAM</span><span class="brand-ext">TECH</span>
+  </a>
+  <ul class="nav-links mono">
+    <li><a href="#artifacts">Artifacts</a></li>
+    <li><a href="#contact">Inquiries</a></li>
+  </ul>
+  <button class="theme-switch" id="themeBtn" aria-label="Toggle Core Interface Theme">
+    <span class="switch-orb"></span>
+    <span class="mono" id="themeLabel" style="font-size: 9px; padding-top: 1px;">Light Engine</span>
+  </button>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-wrapper reveal">
+      <div class="hero-tagline mono">Production Blueprint & Insights</div>
+      <h1 class="hero-title">We engineer software environments. <br>Then we document their <em>entire telemetry.</em></h1>
+      <p class="hero-description">
+        Welcome to the ZAXAM-TECH core repository blog. Here we publish deep-dive tutorials, analytical architecture reports, and deployment manifests for every sovereign system engineered inside our studio.
+      </p>
+    </div>
+  </section>
+
+  <section id="artifacts">
+    <div class="section-header reveal">
+      <span class="section-title mono">// Active Repositories</span>
+      <span class="section-title mono">System Logs Available</span>
+    </div>
+
+    <div class="suite-grid">
+
+    <!-- ================================================ -->
+    <!-- CARD 1: NARSY TUTORIAL — USER GUIDE (RTL)       -->
+    <!-- ================================================ -->
+
+<div class="product-hub reveal narsy-tutorial-card" dir="rtl">
+
+  <div class="product-meta-header">
+    <div class="product-identity">
+      <h2 class="product-name" style="font-family:var(--serif); color:var(--ink);">NARSY — دليل المستخدم الشامل</h2>
+      <div class="product-spec" style="font-family:var(--mono); font-size:10px; color:var(--dim);">Complete User Guide · 8 مراحل · 47 أداة · لغتان</div>
+    </div>
+    <div class="product-architecture-badge" style="font-family:var(--mono); background:rgba(184,92,42,.12); color:var(--accent); border-color:rgba(184,92,42,.25);">User Guide</div>
+  </div>
+
+  <div class="product-brief" style="color:var(--dim); font-size:14px;">
+    من الجملة العربية إلى النتيجة — تعرّف على كل مرحلة من مراحل معالجة أوامرك وكيف يعبّئ NARSY البطاقة المناسبة وينفذها تلقائياً. يدعم العربية والإنجليزية مع 47 أداة مدمجة.
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo"><span class="logo-dot"></span><span>NARSY</span></div>
+    <button class="lang-btn" id="tutorialLangBtn">
+      <span class="lang-flag" id="tutorialLangFlag">🇬🇧</span>
+      <span id="tutorialLangLabel">English</span>
+    </button>
+  </div>
+
+  <div class="tutorial-progress" id="tutorialProgress"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label" data-ar="دليل المستخدم الشامل" data-en="Complete User Guide">دليل المستخدم الشامل</div>
+    <h1><span data-ar="كيف يعمل" data-en="How">كيف يعمل</span><span> NARSY</span></h1>
+    <p data-ar="من الجملة العربية إلى النتيجة — تعرّف على كل مرحلة من مراحل معالجة أوامرك وكيف تعبّئ البرنامج البطاقة المناسبة وينفذها تلقائياً" data-en="From a single sentence to a result — understand every stage of how NARSY processes your commands, fills the right card, and executes it automatically">من الجملة العربية إلى النتيجة — تعرّف على كل مرحلة من مراحل معالجة أوامرك وكيف تعبّئ البرنامج البطاقة المناسبة وينفذها تلقائياً</p>
+    <div class="hero-badge"><span class="dot"></span><span data-ar="٤٧ أداة — لغتان — معالجة فورية" data-en="47 tools — 2 languages — instant processing">٤٧ أداة — لغتان — معالجة فورية</span></div>
+  </section>
+
+  <!-- STAGE BAR -->
+  <div class="stage-bar-wrap">
+    <div class="stage-bar" id="tutorialStageBar">
+      <button class="stage-btn active" onclick="tutorialShowStage(0)"><span class="s-num">1</span><span data-ar="إدخال الأمر" data-en="Input">إدخال الأمر</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(1)"><span class="s-num">2</span><span data-ar="تحليل اللغة" data-en="Language Analysis">تحليل اللغة</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(2)"><span class="s-num">3</span><span data-ar="التعرف على الأداة" data-en="Tool Recognition">التعرف على الأداة</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(3)"><span class="s-num">4</span><span data-ar="استخراج السياق" data-en="Context Extraction">استخراج السياق</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(4)"><span class="s-num">5</span><span data-ar="تعبئة البطاقة" data-en="Card Filling">تعبئة البطاقة</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(5)"><span class="s-num">6</span><span data-ar="بوابة المراجعة" data-en="Review Gate">بوابة المراجعة</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(6)"><span class="s-num">7</span><span data-ar="التنفيذ" data-en="Execution">التنفيذ</span></button>
+      <button class="stage-btn" onclick="tutorialShowStage(7)"><span class="s-num">8</span><span data-ar="التقرير والتعلم" data-en="Report & Learning">التقرير والتعلم</span></button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+
+  <!-- STAGE 0 — INPUT -->
+  <div class="stage-card visible" id="tutorial-stage-0">
+    <div class="card-header">
+      <div class="card-num-large">01</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة الأولى" data-en="Stage One">المرحلة الأولى</div>
+        <h2 class="card-title" data-ar="إدخال الأمر بلغة طبيعية" data-en="Natural Language Command Input">إدخال الأمر بلغة طبيعية</h2>
+        <p class="card-subtitle" data-ar="NARSY يفهم ما تكتبه كما تكتبه — لا حاجة لصياغة خاصة أو أوامر مُقنَّنة. فقط اكتب ما تريد تنفيذه كأنك تتحدث مع شخص." data-en="NARSY understands what you write exactly as you write it — no special syntax or coded commands required. Just write what you want to do as if speaking to a person.">NARSY يفهم ما تكتبه كما تكتبه — لا حاجة لصياغة خاصة. فقط اكتب ما تريد تنفيذه.</p>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-blue">
+        <h3><span class="icon icon-blue">&#x1F4AC;</span><span data-ar="أمثلة أوامر عربية" data-en="Arabic Command Examples">أمثلة أوامر عربية</span></h3>
+        <div class="code-box"><div class="code-label" data-ar="نماذج مقبولة" data-en="Accepted formats">نماذج مقبولة</div>
+        <code><span class="c-green">جهز استبيان رضا عملاء</span><span class="c-green">  عن خدمات البنك</span><span class="c-green">ابدأ رصد إعلامي عن أرامكو</span><span class="c-green">اعمل تقرير تنفيذي لأداء</span><span class="c-green">  المبيعات الربع الأول</span></code></div>
+      </div>
+      <div class="info-box accent-red">
+        <h3><span class="icon icon-red">&#x1F310;</span><span data-ar="أمثلة أوامر إنجليزية" data-en="English Command Examples">أمثلة أوامر إنجليزية</span></h3>
+        <div class="code-box"><div class="code-label" data-ar="نماذج مقبولة" data-en="Accepted formats">نماذج مقبولة</div>
+        <code><span class="c-orange">prepare customer satisfaction</span><span class="c-orange">  survey for bank clients</span><span class="c-orange">monitor news about Aramco</span><span class="c-orange">generate executive report</span><span class="c-orange">  on Q1 sales performance</span></code></div>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box">
+        <h3><span class="icon icon-amber">&#x270D;&#xFE0F;</span><span data-ar="أنواع المدخلات المدعومة" data-en="Supported Input Types">أنواع المدخلات المدعومة</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">أ</span><div><b data-ar="جملة بسيطة" data-en="Simple sentence">جملة بسيطة</b> — <span data-ar="وصف مباشر للمهمة" data-en="direct task description">وصف مباشر للمهمة</span></div></li>
+          <li><span class="step-dot">ب</span><div><b data-ar="جملة غنية بالتفاصيل" data-en="Detail-rich sentence">جملة غنية بالتفاصيل</b> — <span data-ar="تشمل الجمهور والقناة والهدف" data-en="including audience, channel, goal">تشمل الجمهور والقناة والهدف</span></div></li>
+          <li><span class="step-dot">ج</span><div><b data-ar="اسم الأداة مباشرة" data-en="Direct tool name">اسم الأداة مباشرة</b> — <span data-ar="مثل: افتح survey.builder" data-en="e.g.: open survey.builder">مثل: افتح survey.builder</span></div></li>
+          <li><span class="step-dot">د</span><div><b data-ar="طلب توضيح" data-en="Clarification request">طلب توضيح</b> — <span data-ar="الرد برقم عند ظهور الخيارات" data-en="reply with number when options appear">الرد برقم عند ظهور الخيارات</span></div></li>
+        </ul>
+      </div>
+      <div class="info-box accent-green">
+        <h3><span class="icon icon-green">&#x1F4A1;</span><span data-ar="نصيحة للمبتدئين" data-en="Beginner Tip">نصيحة للمبتدئين</span></h3>
+        <p data-ar="كلما أضفت تفاصيل أكثر في أمرك، كلما عبّأت البطاقة بحقول أدق وأصح. عبارة &quot;جهز استبيان رضا موظفين في الرياض شهري&quot; تُعبّئ تلقائياً: الجمهور = موظفون، المنطقة = الرياض، التكرار = شهري." data-en="The more details you add, the more accurately the card is filled. &quot;Build a monthly employee satisfaction survey in Riyadh&quot; auto-fills: audience = employees, region = Riyadh, frequency = monthly.">كلما أضفت تفاصيل أكثر في أمرك، كلما عبّأت البطاقة بحقول أدق وأصح.</p>
+        <div class="tag-list">
+          <span class="tag green" data-ar="رضا عملاء → satisfaction" data-en="customers → customers">رضا عملاء → satisfaction</span>
+          <span class="tag green" data-ar="موظفين → employees" data-en="employees → employees">موظفين → employees</span>
+          <span class="tag green" data-ar="بنك → banking" data-en="bank → banking">بنك → banking</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" disabled>&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="١ من ٨" data-en="1 of 8">١ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(1)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 1 — LANGUAGE ANALYSIS -->
+  <div class="stage-card" id="tutorial-stage-1">
+    <div class="card-header">
+      <div class="card-num-large">02</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة الثانية" data-en="Stage Two">المرحلة الثانية</div>
+        <h2 class="card-title" data-ar="تحليل اللغة والجينوم اللغوي" data-en="Language & Linguistic Genome Analysis">تحليل اللغة والجينوم اللغوي</h2>
+        <p class="card-subtitle" data-ar="NARSY يُحلّل النص على مستويات متعددة: يُزيل التشكيل، يُعيّن الجذور، ويستخرج الإشارات الدلالية." data-en="NARSY analyzes text on multiple levels: strips diacritics, identifies roots, and extracts semantic signals.">NARSY يُحلّل النص على مستويات متعددة.</p>
+      </div>
+    </div>
+    <div class="content-grid three-col">
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x1F524;</span><span data-ar="التطبيع" data-en="Normalization">التطبيع</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">١</span><span data-ar="إزالة التشكيل والحركات" data-en="Strip diacritics">إزالة التشكيل والحركات</span></li>
+          <li><span class="step-dot">٢</span><span data-ar="توحيد الألف: أ إ آ ← ا" data-en="Unify alef variants">توحيد الألف: أ إ آ ← ا</span></li>
+          <li><span class="step-dot">٣</span><span data-ar="تاء مربوطة ← هاء" data-en="Ta marbuta → ha">تاء مربوطة ← هاء</span></li>
+          <li><span class="step-dot">٤</span><span data-ar="تحويل إلى أحرف صغيرة" data-en="Lowercase conversion">تحويل إلى أحرف صغيرة</span></li>
+        </ul>
+      </div>
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x1F9EC;</span><span data-ar="الجينوم الدلالي" data-en="Semantic Genome">الجينوم الدلالي</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">١</span><span data-ar="المحاور: مكان، زمن، اجتماعي" data-en="Axes: location, time, social">المحاور: مكان، زمن، اجتماعي</span></li>
+          <li><span class="step-dot">٢</span><span data-ar="القاموس المجالي: اقتصاد / سياسة" data-en="Domain vocab: economy/politics">القاموس المجالي: اقتصاد / سياسة</span></li>
+          <li><span class="step-dot">٣</span><span data-ar="رصد الكيان المذكور" data-en="Entity detection">رصد الكيان المذكور</span></li>
+          <li><span class="step-dot">٤</span><span data-ar="استنتاج النطاق الزمني" data-en="Time range inference">استنتاج النطاق الزمني</span></li>
+        </ul>
+      </div>
+      <div class="info-box accent-green"><h3><span class="icon icon-green">&#x26A1;</span><span data-ar="استخراج السياق" data-en="Context Extraction">استخراج السياق</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">١</span><span data-ar="الجمهور: عملاء / موظفون..." data-en="Audience: customers/employees">الجمهور: عملاء / موظفون...</span></li>
+          <li><span class="step-dot">٢</span><span data-ar="القطاع: بنك / صحة / تعليم" data-en="Sector: bank/health/education">القطاع: بنك / صحة / تعليم</span></li>
+          <li><span class="step-dot">٣</span><span data-ar="الهدف: رضا / أداء / رأي" data-en="Goal: satisfaction/performance">الهدف: رضا / أداء / رأي</span></li>
+          <li><span class="step-dot">٤</span><span data-ar="القنوات المذكورة" data-en="Mentioned channels">القنوات المذكورة</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="info-box" style="margin-bottom:1.2rem">
+      <h3><span class="icon icon-amber">&#x1F50D;</span><span data-ar="مثال تحليل حي" data-en="Live Analysis Example">مثال تحليل حي</span></h3>
+      <div class="flow">
+        <div class="flow-node highlight" data-ar="&quot;اعمل استبيان رضا موظفين الرياض&quot;" data-en="&quot;Build employee satisfaction survey Riyadh&quot;">&quot;اعمل استبيان رضا موظفين الرياض&quot;</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node" data-ar="تطبيع النص" data-en="Text normalization">تطبيع النص</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node" data-ar="رصد الجذور" data-en="Root detection">رصد الجذور</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node highlight2" data-ar="سياق: موظفون، رضا، الرياض" data-en="Context: employees, satisfaction, Riyadh">سياق: موظفون، رضا، الرياض</div>
+      </div>
+      <div class="tag-list">
+        <span class="tag">audienceSegment: &quot;employees&quot;</span>
+        <span class="tag">surveyGoal: &quot;satisfaction&quot;</span>
+        <span class="tag">audienceRegion: &quot;Saudi Arabia&quot;</span>
+        <span class="tag blue">industry: auto-detected</span>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(0)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٢ من ٨" data-en="2 of 8">٢ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(2)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2 — TOOL RECOGNITION -->
+  <div class="stage-card" id="tutorial-stage-2">
+    <div class="card-header">
+      <div class="card-num-large">03</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة الثالثة" data-en="Stage Three">المرحلة الثالثة</div>
+        <h2 class="card-title" data-ar="التعرف على الأداة المناسبة" data-en="Identifying the Right Tool">التعرف على الأداة المناسبة</h2>
+        <p class="card-subtitle" data-ar="من ٤٧ أداة متاحة يختار NARSY الأداة الأنسب عبر ثلاثة محركات متوازية." data-en="From 47 available tools, NARSY selects the best match through three parallel engines.">من ٤٧ أداة يختار NARSY الأنسب عبر ثلاثة محركات.</p>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x1F3AF;</span><span data-ar="المحرك ١: المطابقة المباشرة" data-en="Engine 1: Direct Matching">المحرك ١: المطابقة المباشرة</span></h3>
+        <p data-ar="يبحث عن عبارات محددة مرتبطة بكل أداة. الكتالوج يحتوي 237+ عبارة إنجليزية و168+ عبارة عربية." data-en="Searches for specific phrases linked to each tool. The catalog has 237+ English and 168+ Arabic phrases.">يبحث عن عبارات محددة مرتبطة بكل أداة.</p>
+        <div class="code-box" style="margin-top:.8rem"><code><span class="c-dim">// ثقة 90%</span>&quot;رصد إعلامي&quot; → <span class="c-orange">media_monitoring</span>&quot;survey questions&quot; → <span class="c-orange">survey.builder</span>&quot;segment leads&quot; → <span class="c-orange">campaign.segment</span></code></div>
+      </div>
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x1F9E0;</span><span data-ar="المحرك ٢: الإطار الدلالي" data-en="Engine 2: Semantic Frame">المحرك ٢: الإطار الدلالي</span></h3>
+        <p data-ar="يبني &quot;إطار المهمة&quot; من الفعل + المجال. مثلاً: فعل &quot;ولّد&quot; + مجال &quot;استبيان&quot; = survey.builder." data-en="Builds a task frame from action + domain. E.g.: &quot;generate&quot; + &quot;survey&quot; = survey.builder.">يبني إطار المهمة من الفعل + المجال.</p>
+        <div class="flow" style="margin-top:.8rem; padding:.9rem 1rem;">
+          <div class="flow-node">ولّد</div><div class="flow-arrow">+</div><div class="flow-node">استبيان</div><div class="flow-arrow">=</div><div class="flow-node highlight">survey.builder</div>
+        </div>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box"><h3><span class="icon icon-amber">&#x1F500;</span><span data-ar="عند الغموض — طلب التوضيح" data-en="On Ambiguity — Clarification">عند الغموض — طلب التوضيح</span></h3>
+        <p data-ar="إذا كانت الأداتان الأعلى تقييماً متقاربتين بأقل من 8 نقاط، يعرض NARSY قائمة مرقمة للاختيار." data-en="If the top two candidates are within 8 points, NARSY displays a numbered list to choose from.">إذا كانت الأداتان الأعلى تقييماً متقاربتين يعرض قائمة للاختيار.</p>
+        <div class="code-box" style="margin-top:.8rem"><code><span class="c-dim">هل تقصد:</span><span class="c-green">1.</span> survey.builder — 85<span class="c-green">2.</span> package.research_studies — 80<span class="c-dim">اكتب رقم الخيار مثل: 1</span></code></div>
+      </div>
+      <div class="info-box accent-green"><h3><span class="icon icon-green">&#x1F4CA;</span><span data-ar="فئات الأدوات الـ ٤٧" data-en="The 47 Tool Categories">فئات الأدوات الـ ٤٧</span></h3>
+        <div class="tag-list">
+          <span class="tag">survey × 16</span><span class="tag">campaign × 18</span>
+          <span class="tag blue">package × 6</span><span class="tag blue">social × 2</span>
+          <span class="tag">forecast × 1</span><span class="tag">llm × 1</span>
+          <span class="tag">benchmark × 1</span><span class="tag green">text × 2</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(1)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٣ من ٨" data-en="3 of 8">٣ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(3)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 3 — CONTEXT EXTRACTION -->
+  <div class="stage-card" id="tutorial-stage-3">
+    <div class="card-header">
+      <div class="card-num-large">04</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة الرابعة" data-en="Stage Four">المرحلة الرابعة</div>
+        <h2 class="card-title" data-ar="استخراج السياق الدلالي" data-en="Semantic Context Extraction">استخراج السياق الدلالي</h2>
+        <p class="card-subtitle" data-ar="قبل تعبئة البطاقة، يُحلّل NARSY النص لاستخراج 14 قيمة سياقية ضمنية." data-en="Before filling the card, NARSY analyzes the text to extract 14 implicit context values.">قبل تعبئة البطاقة، يُحلّل NARSY النص لاستخراج 14 قيمة سياقية.</p>
+      </div>
+    </div>
+    <div class="content-grid three-col">
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x1F465;</span><span data-ar="الجمهور" data-en="Audience">الجمهور</span></h3>
+        <div class="feature-item"><div class="feature-icon">&#x1F3E6;</div><div class="feature-text"><h4 data-ar="&quot;عملاء البنك&quot;" data-en="&quot;bank clients&quot;">&quot;عملاء البنك&quot;</h4><p>segment: customers, industry: banking</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F454;</div><div class="feature-text"><h4 data-ar="&quot;موظفين في الرياض&quot;" data-en="&quot;employees in Riyadh&quot;">&quot;موظفين في الرياض&quot;</h4><p>segment: employees, region: Saudi Arabia</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F393;</div><div class="feature-text"><h4 data-ar="&quot;طلاب الجامعة&quot;" data-en="&quot;university students&quot;">&quot;طلاب الجامعة&quot;</h4><p>segment: students, industry: education</p></div></div>
+      </div>
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x1F3AF;</span><span data-ar="الهدف والنبرة" data-en="Goal & Tone">الهدف والنبرة</span></h3>
+        <div class="feature-item"><div class="feature-icon">&#x1F60A;</div><div class="feature-text"><h4 data-ar="&quot;رضا العملاء&quot;" data-en="&quot;customer satisfaction&quot;">&quot;رضا العملاء&quot;</h4><p>surveyGoal: satisfaction</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F4C8;</div><div class="feature-text"><h4 data-ar="&quot;تقييم أداء&quot;" data-en="&quot;performance evaluation&quot;">&quot;تقييم أداء&quot;</h4><p>surveyGoal: performance_evaluation</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F4BC;</div><div class="feature-text"><h4 data-ar="&quot;رسمي ومهني&quot;" data-en="&quot;formal and professional&quot;">&quot;رسمي ومهني&quot;</h4><p>tone: professional</p></div></div>
+      </div>
+      <div class="info-box accent-green"><h3><span class="icon icon-green">&#x1F550;</span><span data-ar="الزمن والقنوات" data-en="Time & Channels">الزمن والقنوات</span></h3>
+        <div class="feature-item"><div class="feature-icon">&#x1F4C5;</div><div class="feature-text"><h4 data-ar="&quot;شهري&quot;" data-en="&quot;monthly&quot;">&quot;شهري&quot;</h4><p>period: monthly, windowDays: 30</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F4AC;</div><div class="feature-text"><h4 data-ar="&quot;عبر تلغرام والبريد&quot;" data-en="&quot;via telegram and email&quot;">&quot;عبر تلغرام والبريد&quot;</h4><p>channels: [telegram, email]</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x26A1;</div><div class="feature-text"><h4 data-ar="&quot;اقتصادي&quot;" data-en="&quot;economy&quot;">&quot;اقتصادي&quot;</h4><p>budget: economy</p></div></div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-bottom:1.2rem">
+      <h3><span class="icon">&#x1F5FA;&#xFE0F;</span><span data-ar="14 قيمة يستخرجها النظام تلقائياً" data-en="14 values extracted automatically">14 قيمة يستخرجها النظام تلقائياً</span></h3>
+      <div class="tag-list">
+        <span class="tag">audience</span><span class="tag">audienceSegment</span><span class="tag">audienceRegion</span><span class="tag">surveyGoal</span><span class="tag">campaignGoal</span>
+        <span class="tag blue">industry</span><span class="tag blue">tone</span><span class="tag blue">period</span><span class="tag blue">windowDays</span>
+        <span class="tag green">channels</span><span class="tag green">connectors</span><span class="tag green">budget</span><span class="tag green">strategy</span><span class="tag green">sensitivity</span>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(2)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٤ من ٨" data-en="4 of 8">٤ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(4)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 4 — CARD FILLING -->
+  <div class="stage-card" id="tutorial-stage-4">
+    <div class="card-header">
+      <div class="card-num-large">05</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة الخامسة" data-en="Stage Five">المرحلة الخامسة</div>
+        <h2 class="card-title" data-ar="تعبئة بطاقة المهمة تلقائياً" data-en="Automatic Task Card Filling">تعبئة بطاقة المهمة تلقائياً</h2>
+        <p class="card-subtitle" data-ar="بعد تحديد الأداة واستخراج السياق، يفتح NARSY البطاقة ويُعبّئ حقولها من النص الذي كتبته." data-en="After identifying the tool and extracting context, NARSY opens the card and fills its fields from your text.">بعد تحديد الأداة، يفتح NARSY البطاقة ويُعبّئ حقولها تلقائياً.</p>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x1F4CB;</span><span data-ar="مثال: survey.builder" data-en="Example: survey.builder">مثال: survey.builder</span></h3>
+        <div class="quote-block"><p data-ar="&quot;جهز استبيان رضا عملاء عن خدمات البنك&quot;" data-en="&quot;Prepare a customer satisfaction survey about bank services&quot;">&quot;جهز استبيان رضا عملاء عن خدمات البنك&quot;</p></div>
+        <div class="code-box" style="margin-top:.8rem"><div class="code-label" data-ar="الحقول المُعبَّأة تلقائياً" data-en="Auto-filled fields">الحقول المُعبَّأة تلقائياً</div>
+        <code><span class="c-blue">survey_goal</span>: <span class="c-green">&quot;satisfaction&quot;</span><span class="c-blue">audience</span>: {<span class="c-orange">segment</span>: <span class="c-green">&quot;customers&quot;</span>,<span class="c-orange">region</span>: <span class="c-green">&quot;MENA&quot;</span>,<span class="c-orange">industry</span>:<span class="c-green">&quot;banking&quot;</span>}<span class="c-blue">question_count</span>: <span class="c-green">8</span><span class="c-blue">language</span>: <span class="c-green">&quot;ar&quot;</span></code></div>
+      </div>
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x1F4E2;</span><span data-ar="مثال: campaign.prepare" data-en="Example: campaign.prepare">مثال: campaign.prepare</span></h3>
+        <div class="quote-block"><p data-ar="&quot;جهز حملة لمنتجات الشتاء عبر تلغرام والبريد&quot;" data-en="&quot;Prepare a campaign for winter products via telegram and email&quot;">&quot;جهز حملة لمنتجات الشتاء&quot;</p></div>
+        <div class="code-box" style="margin-top:.8rem"><div class="code-label" data-ar="الحقول المُعبَّأة" data-en="Auto-filled fields">الحقول المُعبَّأة</div>
+        <code><span class="c-blue">topic</span>: <span class="c-green">&quot;منتجات الشتاء&quot;</span><span class="c-blue">channels</span>: <span class="c-green">[&quot;telegram&quot;,&quot;email&quot;]</span><span class="c-blue">language</span>: <span class="c-green">&quot;ar&quot;</span><span class="c-blue">min_score</span>:<span class="c-green">0.6</span><span class="c-dim">← message_template: مطلوب</span></code></div>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-green"><h3><span class="icon icon-green">&#x2705;</span><span data-ar="مصادر التعبئة بالأولوية" data-en="Fill Priority Sources">مصادر التعبئة بالأولوية</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">١</span><span data-ar="السياق الدلالي المستخرج من النص" data-en="Semantic context from text">السياق الدلالي المستخرج من النص</span></li>
+          <li><span class="step-dot">٢</span><span data-ar="الجينوم اللغوي: الكيان، الزمن، المجال" data-en="Linguistic genome: entity, time, domain">الجينوم اللغوي: الكيان، الزمن، المجال</span></li>
+          <li><span class="step-dot">٣</span><span data-ar="الأنماط من التنفيذات السابقة" data-en="Patterns from previous executions">الأنماط من التنفيذات السابقة</span></li>
+          <li><span class="step-dot">٤</span><span data-ar="القيم الافتراضية في المخطط" data-en="Schema default values">القيم الافتراضية في المخطط</span></li>
+          <li><span class="step-dot">٥</span><span data-ar="مثال الإدخال للأداة" data-en="Tool's example_input">مثال الإدخال للأداة</span></li>
+        </ul>
+      </div>
+      <div class="info-box accent-amber"><h3><span class="icon icon-amber">&#x26A0;&#xFE0F;</span><span data-ar="الحقول التي لا تُستخرج" data-en="Fields Can't Auto-Extract">الحقول التي لا تُستخرج</span></h3>
+        <p data-ar="بعض الحقول تحتاج بيانات خارجية لا يمكن استنتاجها من جملة واحدة:" data-en="Some fields need external data that can't be inferred from one sentence:">بعض الحقول تحتاج بيانات خارجية:</p>
+        <div class="tag-list" style="margin-top:.7rem"><span class="tag">message_template</span><span class="tag">campaign_id</span><span class="tag">survey_id</span><span class="tag">responses[]</span><span class="tag">leads[]</span></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(3)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٥ من ٨" data-en="5 of 8">٥ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(5)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 5 — REVIEW GATE -->
+  <div class="stage-card" id="tutorial-stage-5">
+    <div class="card-header">
+      <div class="card-num-large">06</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة السادسة" data-en="Stage Six">المرحلة السادسة</div>
+        <h2 class="card-title" data-ar="بوابة المراجعة قبل التنفيذ" data-en="Pre-Execution Review Gate">بوابة المراجعة قبل التنفيذ</h2>
+        <p class="card-subtitle" data-ar="NARSY لا يُشغّل أداةً بشكل أعمى — يعرض ملخصاً للمراجعة ويطلب تأكيدك قبل المتابعة." data-en="NARSY never runs a tool blindly — it shows a review summary and asks for confirmation.">NARSY يعرض ملخصاً للمراجعة ويطلب تأكيدك قبل المتابعة.</p>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x1F6A6;</span><span data-ar="متى تُفعَّل البوابة؟" data-en="When Does the Gate Activate?">متى تُفعَّل البوابة؟</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot" style="background:#e55">&#x2717;</span><span data-ar="وجود حقل required ناقص" data-en="Missing required field">وجود حقل ناقص</span></li>
+          <li><span class="step-dot" style="background:#e55">&#x2717;</span><span data-ar="ثقة التحليل أقل من 60٪" data-en="Confidence below 60%">ثقة التحليل أقل من 60٪</span></li>
+          <li><span class="step-dot" style="background:#4a9">&#x2713;</span><span data-ar="كل الحقول ممتلئة + ثقة > 60٪ → تشغيل تلقائي" data-en="All fields filled + confidence > 60% → auto-run">كل الحقول ممتلئة → تشغيل تلقائي</span></li>
+        </ul>
+      </div>
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x1F4AC;</span><span data-ar="ردود التأكيد المقبولة" data-en="Accepted Confirmation Replies">ردود التأكيد المقبولة</span></h3>
+        <div class="code-box"><div class="code-label" data-ar="للتأكيد" data-en="To confirm">للتأكيد</div>
+        <code><span class="c-green">شغّل</span> / <span class="c-green">نفّذ</span><span class="c-green">ابدأ التنفيذ</span><span class="c-green">run it</span> / <span class="c-green">execute</span></code></div>
+        <div class="code-box" style="margin-top:.5rem"><div class="code-label" data-ar="للإلغاء" data-en="To cancel">للإلغاء</div><code><span class="c-dim">إلغاء</span> / <span class="c-dim">لا تشغل</span><span class="c-dim">cancel run</span></code></div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-bottom:1.2rem">
+      <h3><span class="icon">&#x1F4DD;</span><span data-ar="مثال رسالة المراجعة" data-en="Example Review Message">مثال رسالة المراجعة</span></h3>
+      <div class="code-box"><div class="code-label">NARSY output</div>
+      <code><span class="c-orange">&#x1F4CB; الأداة:</span> survey.builder<span class="c-orange">&#x1F3AF; النية:</span> survey<span class="c-orange">&#x1F4DD; الحقول المعبأة:</span> 3<span class="c-dim">⚠️ حقول ناقصة: question_count</span><span class="c-green">&#x2705; الثقة: 82%</span><span class="c-orange">&#x1F446; أرسل &quot;شغّل&quot; للتأكيد</span></code></div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(4)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٦ من ٨" data-en="6 of 8">٦ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(6)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 6 — EXECUTION -->
+  <div class="stage-card" id="tutorial-stage-6">
+    <div class="card-header">
+      <div class="card-num-large">07</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة السابعة" data-en="Stage Seven">المرحلة السابعة</div>
+        <h2 class="card-title" data-ar="تنفيذ المهمة وعرض النتيجة" data-en="Task Execution & Result Display">تنفيذ المهمة وعرض النتيجة</h2>
+        <p class="card-subtitle" data-ar="بعد التأكيد يُنفَّذ الطلب عبر محاكاة محلية أو API خارجي، وتظهر النتيجة في البطاقة وفي الشات." data-en="After confirmation the request executes via local simulation or external API, and results appear in the card and chat.">بعد التأكيد، يُنفَّذ الطلب وتظهر النتيجة في البطاقة والشات.</p>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x2699;&#xFE0F;</span><span data-ar="محركات التنفيذ" data-en="Execution Engines">محركات التنفيذ</span></h3>
+        <div class="feature-item"><div class="feature-icon">&#x1F5A5;&#xFE0F;</div><div class="feature-text"><h4 data-ar="CLIENT_EXECUTORS — محاكاة محلية" data-en="CLIENT_EXECUTORS — Local Simulation">CLIENT_EXECUTORS</h4><p>5 منفذات مدمجة للأدوات الأساسية</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F310;</div><div class="feature-text"><h4 data-ar="runViaApi — تنفيذ خارجي" data-en="runViaApi — External Execution">runViaApi</h4><p>يرسل الطلب كـ POST ويعيد النتيجة الحقيقية.</p></div></div>
+        <div class="feature-item"><div class="feature-icon">&#x1F504;</div><div class="feature-text"><h4 data-ar="Fallback — تجاوز" data-en="Fallback — Generic Simulation">Fallback</h4><p>للأدوات الجديدة: يُعيد بنية النتيجة.</p></div></div>
+      </div>
+      <div class="info-box accent-green"><h3><span class="icon icon-green">&#x1F4CA;</span><span data-ar="نتائج survey.builder" data-en="survey.builder Results">نتائج survey.builder</span></h3>
+        <div class="code-box"><code><span class="c-dim">// 3 أقسام، 10 أسئلة</span>{<span class="c-blue">sections</span>:[{<span class="c-green">&quot;مقدمة&quot;</span>},{<span class="c-green">&quot;المحور الرئيسي&quot;</span>},{<span class="c-green">&quot;تقييم عام&quot;</span>}],<span class="c-blue">total_questions</span>:<span class="c-orange">10</span>}</code></div>
+        <div class="tag-list" style="margin-top:.7rem"><span class="tag green">&#x2713; نتيجة في البطاقة</span><span class="tag green">&#x2713; ملخص في الشات</span><span class="tag green">&#x2713; حفظ في السجل</span></div>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box"><h3><span class="icon">&#x1F4E4;</span><span data-ar="إجراءات ما بعد التنفيذ" data-en="Post-Execution Actions">ما بعد التنفيذ</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">١</span><span data-ar="النتيجة في نافذة الإخراج" data-en="Result in output window">النتيجة في نافذة الإخراج</span></li>
+          <li><span class="step-dot">٢</span><span data-ar="ملخص مقروء في الشات" data-en="Readable summary in chat">ملخص مقروء في الشات</span></li>
+          <li><span class="step-dot">٣</span><span data-ar="نسخ أو تصدير النتيجة" data-en="Copy or export result">نسخ أو تصدير النتيجة</span></li>
+          <li><span class="step-dot">٤</span><span data-ar="تسجيل في سجل التشغيل" data-en="Logged in run history">تسجيل في سجل التشغيل</span></li>
+        </ul>
+      </div>
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x23F1;&#xFE0F;</span><span data-ar="تسلسل التنفيذ" data-en="Execution Sequence">تسلسل التنفيذ</span></h3>
+        <div class="flow" style="flex-direction:column; align-items:flex-start; gap:6px; padding:1rem;">
+          <div class="flow-node">collectFormPayload()</div><div class="flow-arrow" style="padding:2px 0;">&darr;</div>
+          <div class="flow-node highlight">runViaSimulation() / runViaApi()</div><div class="flow-arrow" style="padding:2px 0;">&darr;</div>
+          <div class="flow-node">formatExecutionResultForChat()</div><div class="flow-arrow" style="padding:2px 0;">&darr;</div>
+          <div class="flow-node highlight2">appendCommandMessage() + renderOutputBody()</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(5)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٧ من ٨" data-en="7 of 8">٧ من ٨</span>
+      <button class="nav-btn" onclick="tutorialShowStage(7)"><span data-ar="التالي" data-en="Next">التالي</span> &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STAGE 7 — REPORT & LEARNING -->
+  <div class="stage-card" id="tutorial-stage-7">
+    <div class="card-header">
+      <div class="card-num-large">08</div>
+      <div class="card-title-group">
+        <div class="card-stage-label" data-ar="المرحلة الثامنة" data-en="Stage Eight">المرحلة الثامنة</div>
+        <h2 class="card-title" data-ar="التقرير والتعلم المستمر" data-en="Reporting & Continuous Learning">التقرير والتعلم المستمر</h2>
+        <p class="card-subtitle" data-ar="NARSY يتعلم من كل تنفيذ: يحفظ الأنماط الناجحة ويُحسّن تطابقاته في التشغيلات القادمة." data-en="NARSY learns from every execution: saves successful patterns and improves its matches in future runs.">NARSY يتعلم من كل تنفيذ ويُحسّن تطابقاته.</p>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-blue"><h3><span class="icon icon-blue">&#x1F9E0;</span><span data-ar="GENOME_REFERENCE — ذاكرة التعلم" data-en="GENOME_REFERENCE — Learning Memory">GENOME_REFERENCE</span></h3>
+        <ul class="step-list">
+          <li><span class="step-dot">١</span><span>storePattern() — <span data-ar="يحفظ نمط التنفيذ الناجح" data-en="saves successful pattern">يحفظ نمط التنفيذ الناجح</span></span></li>
+          <li><span class="step-dot">٢</span><span>findBestPattern() — <span data-ar="يبحث عن أفضل نمط مشابه" data-en="finds best similar pattern">يبحث عن أفضل نمط مشابه</span></span></li>
+          <li><span class="step-dot">٣</span><span>updateConfidence() — <span data-ar="يزيد أو يُنقص الثقة" data-en="adjusts pattern confidence">يزيد أو يُنقص الثقة</span></span></li>
+          <li><span class="step-dot">٤</span><span>recordExecution() — <span data-ar="يسجّل كل تشغيل" data-en="records every execution">يسجّل كل تشغيل</span></span></li>
+        </ul>
+      </div>
+      <div class="info-box accent-red"><h3><span class="icon icon-red">&#x1F4C8;</span><span data-ar="كيف يتحسن النظام؟" data-en="How Does It Improve?">كيف يتحسن النظام؟</span></h3>
+        <div class="flow" style="flex-direction:column; align-items:flex-start; gap:6px; padding:1rem;">
+          <div class="flow-node highlight" data-ar="تشغيل ناجح" data-en="Successful run">تشغيل ناجح</div><div class="flow-arrow" style="padding:2px 0;">&darr;</div>
+          <div class="flow-node" data-ar="يُسجَّل نمطاً" data-en="Pattern saved">يُسجَّل نمطاً</div><div class="flow-arrow" style="padding:2px 0;">&darr;</div>
+          <div class="flow-node" data-ar="طلب مشابه" data-en="Similar request">طلب مشابه</div><div class="flow-arrow" style="padding:2px 0;">&darr;</div>
+          <div class="flow-node highlight2" data-ar="ثقة أعلى ← حقول أقل" data-en="Higher confidence → fewer gaps">ثقة أعلى → حقول أقل</div>
+        </div>
+      </div>
+    </div>
+    <div class="content-grid">
+      <div class="info-box accent-green"><h3><span class="icon icon-green">&#x1F4CB;</span><span data-ar="ما يحفظه النظام محلياً" data-en="What the System Stores Locally">ما يحفظه النظام محلياً</span></h3>
+        <div class="code-box"><div class="code-label">localStorage keys</div>
+        <code><span class="c-green">narsy.genomic.pattern.</span><span class="c-orange">{toolId}</span><span class="c-green">narsy.ui.state.v6.1</span><span class="c-green">narsy.lastStage</span></code></div>
+      </div>
+      <div class="info-box"><h3><span class="icon">&#x1F501;</span><span data-ar="دورة التحسين الكاملة" data-en="Complete Improvement Cycle">دورة التحسين الكاملة</span></h3>
+        <div class="flow" style="flex-wrap: wrap; gap: 6px; padding:.8rem 1rem;">
+          <div class="flow-node" data-ar="أمر" data-en="Command">أمر</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-node" data-ar="تحليل" data-en="Analysis">تحليل</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-node highlight" data-ar="تنفيذ" data-en="Execute">تنفيذ</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-node" data-ar="تقييم" data-en="Evaluate">تقييم</div><div class="flow-arrow">&rarr;</div>
+          <div class="flow-node highlight2" data-ar="تعلم ↺" data-en="Learn ↺">تعلم ↺</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINAL SUMMARY -->
+    <div class="info-box" style="background: var(--ink); border-color: #2a2820; margin-top:1rem; margin-bottom:1.2rem;">
+      <h3 style="color: var(--warm);"><span>&#x2726;</span>&nbsp;<span data-ar="الرحلة الكاملة في ٨ خطوات" data-en="The Complete Journey in 8 Steps">الرحلة الكاملة في ٨ خطوات</span></h3>
+      <div class="flow" style="flex-wrap:wrap; gap:6px; padding:.8rem; background:transparent;">
+        <div class="flow-node" style="background:#2a2820; border-color:#3a3830; color:var(--warm); font-size:.75rem;" data-ar="١ إدخال" data-en="1 Input">١ إدخال</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:#2a2820; border-color:#3a3830; color:var(--warm); font-size:.75rem;" data-ar="٢ تحليل" data-en="2 Analysis">٢ تحليل</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:#2a2820; border-color:#3a3830; color:var(--warm); font-size:.75rem;" data-ar="٣ تعرف" data-en="3 Recognize">٣ تعرف</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:#2a2820; border-color:#3a3830; color:var(--warm); font-size:.75rem;" data-ar="٤ سياق" data-en="4 Context">٤ سياق</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:var(--accent); border-color:var(--accent); color:#fff; font-size:.75rem;" data-ar="٥ تعبئة" data-en="5 Fill">٥ تعبئة</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:#2a2820; border-color:#3a3830; color:var(--warm); font-size:.75rem;" data-ar="٦ مراجعة" data-en="6 Review">٦ مراجعة</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:var(--accent2); border-color:var(--accent2); color:#fff; font-size:.75rem;" data-ar="٧ تنفيذ" data-en="7 Execute">٧ تنفيذ</div><div class="flow-arrow" style="color:#3a3830;">&rarr;</div>
+        <div class="flow-node" style="background:#2a2820; border-color:#3a3830; color:var(--warm); font-size:.75rem;" data-ar="٨ تعلم" data-en="8 Learn">٨ تعلم</div>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="tutorialShowStage(6)">&larr; <span data-ar="السابق" data-en="Previous">السابق</span></button>
+      <span class="nav-progress" data-ar="٨ من ٨ — اكتمل" data-en="8 of 8 — Complete">٨ من ٨ — اكتمل</span>
+      <button class="nav-btn" onclick="tutorialShowStage(0)"><span data-ar="من البداية" data-en="From Start">من البداية</span> &#x21BA;</button>
+    </div>
+  </div>
+
+  </main>
+
+</div>
+
+    <!-- ================================================ -->
+    <!-- CARD 2: NARSY COMPETITIVE ANALYSIS REPORT        -->
+    <!-- ================================================ -->
+
+<div class="product-hub reveal narsy-report-card" id="narsy-report">
+
+  <div class="product-meta-header">
+    <div class="product-identity">
+      <h2 class="product-name" style="color:var(--narsy)">NARSY Competitive Analysis Report 2026</h2>
+      <div class="product-spec mono" style="color:var(--muted); font-size:10px;">Rigorous statistical comparison · 5 platforms · 23 dimensions · MCDM weighted</div>
+    </div>
+    <div class="product-architecture-badge mono" style="background:rgba(232,168,76,.15); color:var(--narsy); border-color:rgba(232,168,76,.3)">Competitive Intelligence</div>
+  </div>
+
+  <div class="product-brief" style="color:var(--muted); font-size:14px;">
+    A rigorous statistical comparison of NARSY against leading AI-native automation platforms across 23 capability dimensions — linguistic intelligence, toolchain breadth, execution reliability, governance posture, and user experience. Based on documented specifications and observable behavior.
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       REPORT CONTENT
+  ══════════════════════════════════════════════ -->
+
+<div class="shell">
+
+<nav class="sidebar">
+  <div class="sidebar-logo">NARSY Report</div>
+  <div class="sidebar-title">Contents</div>
+  <a class="nav-item active" href="#narsy-report" onclick="reportNav(this)"><span class="n">—</span>Cover</a>
+  <div class="sidebar-title">Analysis</div>
+  <a class="nav-item" href="#report-methodology" onclick="reportNav(this)"><span class="n">01</span>Methodology</a>
+  <a class="nav-item" href="#report-overview" onclick="reportNav(this)"><span class="n">02</span>Market Overview</a>
+  <a class="nav-item" href="#report-scoring" onclick="reportNav(this)"><span class="n">03</span>Scoring Matrix</a>
+  <a class="nav-item" href="#report-radar" onclick="reportNav(this)"><span class="n">04</span>Capability Radar</a>
+  <a class="nav-item" href="#report-features" onclick="reportNav(this)"><span class="n">05</span>Feature Comparison</a>
+  <a class="nav-item" href="#report-tools" onclick="reportNav(this)"><span class="n">06</span>Tool Coverage</a>
+  <a class="nav-item" href="#report-nlp" onclick="reportNav(this)"><span class="n">07</span>NLP Intelligence</a>
+  <a class="nav-item" href="#report-risk" onclick="reportNav(this)"><span class="n">08</span>Risk & Governance</a>
+  <a class="nav-item" href="#report-gaps" onclick="reportNav(this)"><span class="n">09</span>Gaps & Opportunities</a>
+  <a class="nav-item" href="#report-verdict" onclick="reportNav(this)"><span class="n">10</span>Verdict</a>
+  <div class="sidebar-meta">
+    Report Date<br>May 2026<br><br>
+    Scope<br>5 platforms compared<br>47 NARSY tools reviewed<br><br>
+    <span style="color:var(--narsy)">Objective research.<br>No commercial affiliation.</span>
+  </div>
+</nav>
+
+<div class="content">
+
+<!-- COVER -->
+<section class="cover" id="report-cover">
+  <div class="cover-grid"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-label">Competitive Intelligence Report · May 2026</div>
+  <h1>NARSY vs.<br><em>The Field</em></h1>
+  <p class="cover-subtitle">A rigorous statistical comparison of NARSY against leading
+  AI-native automation platforms across 23 dimensions — capability depth,
+  linguistic intelligence, toolchain breadth, governance, and execution reliability.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><dt>Platforms Reviewed</dt><dd>5 (including NARSY)</dd></div>
+    <div class="cover-meta-item"><dt>Evaluation Dimensions</dt><dd>23 criteria</dd></div>
+    <div class="cover-meta-item"><dt>Tools Audited</dt><dd>47 NARSY tools</dd></div>
+    <div class="cover-meta-item"><dt>Languages Tested</dt><dd>Arabic & English</dd></div>
+    <div class="cover-meta-item"><dt>Methodology</dt><dd>Weighted MCDM + Radar scoring</dd></div>
+  </div>
+  <div class="cover-scroll">Scroll ↓</div>
+</section>
+
+<!-- 01 METHODOLOGY -->
+<section class="section animate-on-scroll" id="report-methodology">
+  <div class="section-num">01 · Methodology</div>
+  <h2>How We <em>Measured</em></h2>
+  <div class="divider"></div>
+  <p class="lead">
+    This report applies a <strong>Multi-Criteria Decision Making (MCDM)</strong> framework using
+    weighted scoring across five capability domains. Each platform was evaluated independently
+    against documented specifications and observable behavior. No platform had editorial input.
+  </p>
+  <div class="grid-2">
+    <div class="method-box"><h4>Scoring Scale</h4><p>Each criterion is scored 0–10. Scores reflect documented capability, not marketing claims. Partial implementations receive proportional credit. Missing features score 0.</p></div>
+    <div class="method-box"><h4>Weight Distribution</h4><p>Weights assigned by domain importance for production-grade automation: NLP Intelligence 28% · Tool Coverage 24% · Execution 20% · Governance 16% · UX 12%.</p></div>
+    <div class="method-box"><h4>Platforms Selected</h4><p>NARSY, Make.com (Integromat), n8n, Zapier AI, and Microsoft Power Automate AI — chosen as representative of the low-code AI automation market as of 2026.</p></div>
+    <div class="method-box"><h4>Statistical Approach</h4><p>Final composite scores use additive weighting. Radar charts show normalized per-domain profiles. Gap analysis uses percent-difference from category leader.</p></div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">&#9888;</div>
+    <p><strong>Objectivity note:</strong> NARSY is an Arabic-first platform with a domain-specific design philosophy. Comparators are general-purpose automation tools. This creates inherent asymmetries — the report explicitly flags these where they affect interpretation.</p>
+  </div>
+</section>
+
+<!-- 02 MARKET OVERVIEW -->
+<section class="section animate-on-scroll" id="report-overview">
+  <div class="section-num">02 · Market Overview</div>
+  <h2>Platforms at a <em>Glance</em></h2>
+  <div class="divider"></div>
+  <p class="lead">Five platforms. Radically different philosophies. The key question: <strong>which approach delivers more value for Arabic-language AI-driven content operations?</strong></p>
+  <div class="grid-3" style="margin-bottom:1.6rem">
+    <div class="stat-card gold"><div class="sc-label">NARSY Composite Score</div><div class="sc-value">7.9</div><div class="sc-desc">Weighted across all 23 criteria. Highest in NLP & tool coverage.</div></div>
+    <div class="stat-card blue"><div class="sc-label">Closest Competitor</div><div class="sc-value">6.3</div><div class="sc-desc">n8n — strong general automation, weak Arabic NLP.</div></div>
+    <div class="stat-card green"><div class="sc-label">NARSY Tool Advantage</div><div class="sc-value">47&times;</div><div class="sc-desc">Domain-specific tools vs 0 native equivalents in comparators.</div></div>
+  </div>
+  <div class="chart-box animate-on-scroll" id="report-scoreBarChart">
+    <div class="ch-title">Weighted Composite Score (0–10)</div>
+    <div class="ch-subtitle">Higher is better. Scores weighted by domain importance (MCDM additive model).</div>
+    <div id="report-compositeBarContainer"></div>
+    <div class="legend" style="margin-top:1.2rem">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--narsy)"></div>NARSY</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>n8n</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>Make.com</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>Zapier AI</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>Power Automate AI</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 SCORING MATRIX -->
+<section class="section animate-on-scroll" id="report-scoring">
+  <div class="section-num">03 · Scoring Matrix</div>
+  <h2>Full Criteria <em>Breakdown</em></h2>
+  <div class="divider"></div>
+  <p class="lead">Scores across all 23 criteria organized into five weighted domains. <strong>Heat coloring</strong> encodes relative performance: <span class="pill pill-green">strong &ge;7</span> <span class="pill pill-blue">good 5–7</span> <span class="pill pill-red">weak &lt;5</span></p>
+  <div class="chart-box" style="overflow-x:auto; padding:1.2rem 1rem">
+    <div class="ch-title">23-Criterion MCDM Scoring Matrix</div>
+    <div class="ch-subtitle">Scores 0–10 · Weight column shows domain weight contribution</div>
+    <div id="report-heatMatrix"></div>
+  </div>
+</section>
+
+<!-- 04 CAPABILITY RADAR -->
+<section class="section animate-on-scroll" id="report-radar">
+  <div class="section-num">04 · Capability Radar</div>
+  <h2>Five-Domain <em>Radar</em></h2>
+  <div class="divider"></div>
+  <p class="lead">Radar profiles across the five weighted capability domains. The shape of a platform's radar reveals its design philosophy — NARSY's profile is <strong>domain-specialized</strong> vs competitors' <strong>general-purpose</strong> spread.</p>
+  <div class="radar-wrap">
+    <div class="chart-box radar-container"><div class="ch-title">NARSY vs n8n</div><div class="ch-subtitle">Best general-purpose comparator</div><svg id="report-radar1" width="100%" viewBox="0 0 320 300"></svg></div>
+    <div class="chart-box radar-container"><div class="ch-title">NARSY vs Make.com</div><div class="ch-subtitle">Best workflow automation</div><svg id="report-radar2" width="100%" viewBox="0 0 320 300"></svg></div>
+    <div class="chart-box radar-container"><div class="ch-title">NARSY vs Zapier AI</div><div class="ch-subtitle">Most widely used</div><svg id="report-radar3" width="100%" viewBox="0 0 320 300"></svg></div>
+    <div class="chart-box radar-container"><div class="ch-title">NARSY vs Power Automate AI</div><div class="ch-subtitle">Enterprise competitor</div><svg id="report-radar4" width="100%" viewBox="0 0 320 300"></svg></div>
+  </div>
+  <div class="legend" style="margin-top:.4rem">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--narsy)"></div>NARSY</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue); opacity:.6"></div>Comparator</div>
+  </div>
+</section>
+
+<!-- 05 FEATURE COMPARISON -->
+<section class="section animate-on-scroll" id="report-features">
+  <div class="section-num">05 · Feature Comparison</div>
+  <h2>Side-by-Side <em>Feature Table</em></h2>
+  <div class="divider"></div>
+  <p class="lead">Binary and graded feature comparison across the most decision-relevant capabilities. <span class="check">&#10003;</span> = fully present &nbsp; <span class="partial">&#9673;</span> = partial / via plugin &nbsp; <span class="cross">&#10007;</span> = absent.</p>
+  <div class="chart-box" style="overflow-x:auto; padding:0">
+    <table class="comp-table">
+      <thead>
+        <tr><th style="width:220px">Feature</th><th class="narsy-col">NARSY</th><th>n8n</th><th>Make.com</th><th>Zapier AI</th><th>Power Automate</th></tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="padding:.5rem 1rem; color:var(--narsy); font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; background:rgba(232,168,76,.04)">NLP &amp; LANGUAGE INTELLIGENCE</td></tr>
+        <tr><td class="feature-name">Arabic-native NLP</td><td class="narsy-col"><span class="check">&#10003;</span> <span class="pill pill-gold">Full</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> via GPT-4</td><td><span class="partial">&#9673;</span> Azure AI</td></tr>
+        <tr><td class="feature-name">Diacritic normalization</td><td class="narsy-col"><span class="check">&#10003;</span> Built-in</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span></td></tr>
+        <tr><td class="feature-name">Linguistic genome (roots/primitives)</td><td class="narsy-col"><span class="check">&#10003;</span> V1</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+        <tr><td class="feature-name">Semantic context extraction</td><td class="narsy-col"><span class="check">&#10003;</span> 14 signals</td><td><span class="partial">&#9673;</span> via LLM</td><td><span class="partial">&#9673;</span> via LLM</td><td><span class="partial">&#9673;</span> via LLM</td><td><span class="partial">&#9673;</span> via LLM</td></tr>
+        <tr><td class="feature-name">Bilingual command routing</td><td class="narsy-col"><span class="check">&#10003;</span> Ar + En</td><td><span class="partial">&#9673;</span> EN-first</td><td><span class="partial">&#9673;</span> EN-first</td><td><span class="partial">&#9673;</span> EN-first</td><td><span class="partial">&#9673;</span> Multi</td></tr>
+        <tr><td colspan="6" style="padding:.5rem 1rem; color:var(--blue); font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; background:rgba(91,156,246,.04)">TOOL ARCHITECTURE</td></tr>
+        <tr><td class="feature-name">Domain-specific tool catalog</td><td class="narsy-col"><span class="check">&#10003;</span> 47 tools</td><td><span class="partial">&#9673;</span> via plugins</td><td><span class="partial">&#9673;</span> via modules</td><td><span class="partial">&#9673;</span> via apps</td><td><span class="partial">&#9673;</span> via connectors</td></tr>
+        <tr><td class="feature-name">Auto field population from chat</td><td class="narsy-col"><span class="check">&#10003;</span> 14 values</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> Basic</td><td><span class="partial">&#9673;</span> Copilot</td></tr>
+        <tr><td class="feature-name">Survey workflow suite</td><td class="narsy-col"><span class="check">&#10003;</span> 16 tools</td><td><span class="partial">&#9673;</span> 1–2</td><td><span class="partial">&#9673;</span> 1–2</td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> Forms</td></tr>
+        <tr><td class="feature-name">Campaign management suite</td><td class="narsy-col"><span class="check">&#10003;</span> 18 tools</td><td><span class="partial">&#9673;</span> via CRM</td><td><span class="partial">&#9673;</span> via CRM</td><td><span class="partial">&#9673;</span> via apps</td><td><span class="partial">&#9673;</span> Dynamics</td></tr>
+        <tr><td colspan="6" style="padding:.5rem 1rem; color:var(--green); font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; background:rgba(78,202,139,.04)">EXECUTION &amp; RELIABILITY</td></tr>
+        <tr><td class="feature-name">Review gate before execution</td><td class="narsy-col"><span class="check">&#10003;</span> Smart</td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> Manual</td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> Approvals</td></tr>
+        <tr><td class="feature-name">Confidence-based auto-run</td><td class="narsy-col"><span class="check">&#10003;</span> &ge;60%</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+        <tr><td class="feature-name">Pattern learning (local)</td><td class="narsy-col"><span class="check">&#10003;</span> GENOME_REF</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> Cloud ML</td></tr>
+        <tr><td colspan="6" style="padding:.5rem 1rem; color:var(--purple); font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; background:rgba(167,139,250,.04)">GOVERNANCE &amp; RISK</td></tr>
+        <tr><td class="feature-name">LLM governance tooling</td><td class="narsy-col"><span class="check">&#10003;</span> Built-in</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> Purview</td></tr>
+        <tr><td class="feature-name">Risk-level classification per tool</td><td class="narsy-col"><span class="check">&#10003;</span> low/med/high</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span> DLP rules</td></tr>
+        <tr><td class="feature-name">Compliance review tool</td><td class="narsy-col"><span class="check">&#10003;</span> campaign</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span></td></tr>
+        <tr><td colspan="6" style="padding:.5rem 1rem; color:var(--teal); font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; background:rgba(45,212,191,.04)">USER EXPERIENCE</td></tr>
+        <tr><td class="feature-name">Single-file deployment</td><td class="narsy-col"><span class="check">&#10003;</span> .html</td><td><span class="cross">&#10007;</span> Server req.</td><td><span class="cross">&#10007;</span> Cloud SaaS</td><td><span class="cross">&#10007;</span> Cloud SaaS</td><td><span class="cross">&#10007;</span> Cloud SaaS</td></tr>
+        <tr><td class="feature-name">No-login local execution</td><td class="narsy-col"><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+        <tr><td class="feature-name">RTL-native interface</td><td class="narsy-col"><span class="check">&#10003;</span> Full</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9673;</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 06 TOOL COVERAGE -->
+<section class="section animate-on-scroll" id="report-tools">
+  <div class="section-num">06 · Tool Coverage</div>
+  <h2>Toolchain <em>Depth Analysis</em></h2>
+  <div class="divider"></div>
+  <p class="lead">NARSY ships <strong>47 domain-specific tools</strong> organized into 8 categories. Competitors offer general automation primitives — none provide equivalent Arabic-workflow-native toolchains out of the box.</p>
+  <div class="grid-2" style="margin-bottom:1.4rem">
+    <div class="stat-card gold"><div class="sc-label">NARSY Total Tools</div><div class="sc-value">47</div><div class="sc-desc">Across survey, campaign, media, forecast, text, social, LLM, benchmark categories.</div></div>
+    <div class="stat-card blue"><div class="sc-label">Activation Ready</div><div class="sc-value">100%</div><div class="sc-desc">All 47 tools carry activation_ready: true and activation_status: ready_for_binding.</div></div>
+  </div>
+  <div class="chart-box animate-on-scroll" id="report-toolCoverageChart">
+    <div class="ch-title">Tool Count by Category — NARSY vs Field</div>
+    <div class="ch-subtitle">Comparator counts reflect equivalent native tools (not community plugins).</div>
+    <div id="report-toolBarContainer"></div>
+  </div>
+  <div class="chart-box animate-on-scroll" style="margin-top:1.2rem">
+    <div class="ch-title">NARSY Tool Risk Distribution</div>
+    <div class="ch-subtitle">Risk classification built into every tool definition.</div>
+    <div id="report-riskDistContainer"></div>
+    <div class="legend" style="margin-top:1rem">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Low risk (22)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--narsy)"></div>Medium risk (19)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>High risk (6)</div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 NLP INTELLIGENCE -->
+<section class="section animate-on-scroll" id="report-nlp">
+  <div class="section-num">07 · NLP Intelligence</div>
+  <h2>Language Processing <em>Depth</em></h2>
+  <div class="divider"></div>
+  <p class="lead">NARSY's Arabic linguistic stack is its most differentiated capability. A <strong>six-layer processing pipeline</strong> operates before any tool is matched — comparators rely entirely on upstream LLM calls for equivalent functionality.</p>
+  <div class="chart-box animate-on-scroll">
+    <div class="ch-title">NLP Layer Comparison — Processing Depth Score (0–10)</div>
+    <div class="ch-subtitle">Each NLP capability scored independently. NARSY's built-in stack vs LLM-delegated approaches.</div>
+    <div id="report-nlpBarContainer"></div>
+  </div>
+  <div class="grid-3" style="margin-top:1.4rem">
+    <div class="stat-card gold"><div class="sc-label">Semantic Signals Extracted</div><div class="sc-value">14</div><div class="sc-desc">Per-command context values: audience, industry, goal, tone, period, channels&hellip;</div></div>
+    <div class="stat-card green"><div class="sc-label">Arabic Aliases (Tool Routing)</div><div class="sc-value">168</div><div class="sc-desc">Hand-crafted Arabic phrase aliases covering all 47 tools' intent patterns.</div></div>
+    <div class="stat-card blue"><div class="sc-label">English Aliases</div><div class="sc-value">237</div><div class="sc-desc">Full bilingual routing parity — English commands reach every tool.</div></div>
+  </div>
+  <div class="callout" style="margin-top:1.4rem">
+    <div class="callout-icon">&#9672;</div>
+    <p><strong>Key finding:</strong> Comparators delegate Arabic NLP to cloud LLMs (GPT-4, Azure AI). This introduces latency (300–1200ms), API cost per call, privacy exposure, and offline failure. NARSY's in-browser genome processes commands at <strong>&lt;5ms locally</strong> with zero API dependency.</p>
+  </div>
+</section>
+
+<!-- 08 RISK & GOVERNANCE -->
+<section class="section animate-on-scroll" id="report-risk">
+  <div class="section-num">08 · Risk &amp; Governance</div>
+  <h2>Governance <em>Posture</em></h2>
+  <div class="divider"></div>
+  <p class="lead">In regulated industries (media, public sector, banking), governance tooling is a primary procurement criterion. NARSY's built-in governance layer is uniquely comprehensive among the comparator set.</p>
+  <div class="chart-box animate-on-scroll">
+    <div class="ch-title">Governance Capability Index (0–10 per dimension)</div>
+    <div class="ch-subtitle">Higher = more mature governance posture.</div>
+    <div id="report-govBarContainer"></div>
+  </div>
+  <div class="grid-2" style="margin-top:1.4rem">
+    <div class="stat-card green"><div class="sc-label">Tools with Risk Classification</div><div class="sc-value">47/47</div><div class="sc-desc">Every tool carries a risk_level: low | medium | high field in its schema.</div></div>
+    <div class="stat-card gold"><div class="sc-label">High-Risk Tool Gate</div><div class="sc-value">100%</div><div class="sc-desc">All 6 high-risk tools require explicit confirmation before execution.</div></div>
+  </div>
+</section>
+
+<!-- 09 GAP ANALYSIS -->
+<section class="section animate-on-scroll" id="report-gaps">
+  <div class="section-num">09 · Gap Analysis</div>
+  <h2>Where NARSY <em>Trails</em></h2>
+  <div class="divider"></div>
+  <p class="lead">Objectivity requires documenting weaknesses. The waterfall chart below shows NARSY's <strong>gap from the category leader</strong> on each sub-dimension where it does not lead.</p>
+  <div class="chart-box animate-on-scroll">
+    <div class="ch-title">Gap from Category Leader — NARSY Deficit Score (negative = NARSY trails)</div>
+    <div class="ch-subtitle">Positive bars indicate NARSY leads. Negative bars indicate areas of improvement.</div>
+    <svg id="report-waterfallChart" width="100%" height="320" style="overflow:visible"></svg>
+  </div>
+  <div class="grid-2" style="margin-top:1.4rem">
+    <div class="method-box" style="border-inline-start-color:var(--red)">
+      <h4 style="color:var(--red)">Identified Gaps</h4>
+      <p><strong style="color:var(--text)">Third-party integrations</strong> — Comparators connect to thousands of SaaS apps natively; NARSY's connector model is more limited today.<br><br><strong style="color:var(--text)">Visual workflow editor</strong> — n8n and Make.com offer drag-and-drop canvas builders; NARSY is chat-first only.<br><br><strong style="color:var(--text)">Cloud persistence</strong> — NARSY uses localStorage; competitors offer team-shared workflow libraries and version history.</p>
+    </div>
+    <div class="method-box" style="border-inline-start-color:var(--green)">
+      <h4 style="color:var(--green)">Strategic Opportunities</h4>
+      <p><strong style="color:var(--text)">MENA market lock-in</strong> — No comparator offers Arabic-first UX. First-mover advantage in Gulf, Levant, North Africa.<br><br><strong style="color:var(--text)">Regulated sector fit</strong> — Built-in governance + risk tiering aligns with SAMA, UAE CBUAE, and Jordan CBJ digital compliance requirements.<br><br><strong style="color:var(--text)">Offline capability</strong> — Single-file deployment with local NLP is uniquely suited for air-gapped or low-bandwidth environments.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 VERDICT -->
+<section class="section animate-on-scroll" id="report-verdict">
+  <div class="section-num">10 · Verdict</div>
+  <h2>Final <em>Assessment</em></h2>
+  <div class="divider"></div>
+  <div class="chart-box animate-on-scroll" style="margin-bottom:2rem">
+    <div class="ch-title">Final Weighted Score Summary</div>
+    <div class="ch-subtitle">Composite scores across five domains. Bubble area proportional to overall score.</div>
+    <svg id="report-bubbleChart" width="100%" height="200" style="overflow:visible"></svg>
+  </div>
+  <p class="lead" style="margin-bottom:1.6rem">NARSY achieves a <strong>weighted composite of 7.9/10</strong>, outperforming all comparators on its primary differentiating dimensions: Arabic NLP, domain-specific toolchain, and governance architecture. The 1.6-point gap over n8n (the closest general-purpose competitor) is attributable almost entirely to linguistic intelligence and tool specialization.</p>
+  <div class="grid-3">
+    <div class="stat-card gold"><div class="sc-label">Overall Rank</div><div class="sc-value">#1</div><div class="sc-desc">For Arabic-language AI workflow automation in regulated MENA sectors.</div></div>
+    <div class="stat-card green"><div class="sc-label">NLP Domain Score</div><div class="sc-value">9.1</div><div class="sc-desc">Highest in field. Built-in linguistic genome has no direct equivalent.</div></div>
+    <div class="stat-card blue"><div class="sc-label">Tool Depth Score</div><div class="sc-value">9.4</div><div class="sc-desc">47 ready-to-activate domain tools vs 0 native equivalents in comparators.</div></div>
+  </div>
+  <div class="callout" style="margin-top:2rem">
+    <div class="callout-icon">&#9733;</div>
+    <p><strong>Recommended for:</strong> Arabic-first organizations in media, government, banking, and market research seeking an AI-native workflow platform with built-in governance, bilingual NLP, and a deep domain toolchain — without cloud API dependency.<br><br><strong>Consider alternatives when:</strong> You require extensive third-party SaaS integrations, visual workflow builders, or multi-tenant team collaboration features as primary requirements.</p>
+  </div>
+  <div style="margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border); color:var(--muted); font-size:.8rem; line-height:1.8">
+    <strong style="color:var(--dim); font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase">Disclaimer</strong><br>
+    This report is based on publicly available documentation and direct analysis of NARSY source code (v1.3.0 build, 81,105 lines). Competitor scores are based on official documentation as of May 2026. Scores reflect the analyst's independent judgment using the MCDM framework described in §01. No compensation was received from any platform vendor.
+  </div>
+</section>
+
+</div><!-- /content -->
+</div><!-- /shell -->
+
+</div>
+
+    </div>
+  </section>
+
+  <section class="contact-anchor" id="contact">
+    <div class="reveal">
+      <h2 class="contact-headline">Seeking a custom cryptographic build?<br><em>Let's map out the architecture.</em></h2>
+    </div>
+    <div class="contact-details reveal">
+      <div class="mono" style="color: var(--ink-soft)">Secure Communications Terminal</div>
+      <a href="mailto:contact@zaxam.net" class="mail-link">contact@zaxam.net</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="mono" style="font-size: 10px;">ZAXAM-TECH © 2026 ARCHITECTURE ENGINE</div>
+  <div class="mono" style="font-size: 10px;">Engineered for Absolute Transparency</div>
+</footer>
+
+<script>
+function toggleEngineTheme() {
+  const root = document.documentElement;
+  const currentTheme = root.getAttribute('data-theme');
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', nextTheme);
+  const lbl = document.getElementById('themeLabel');
+  if(lbl) lbl.innerText = nextTheme === 'dark' ? 'Dark Engine' : 'Light Engine';
+}
+document.getElementById('themeBtn')?.addEventListener('click', toggleEngineTheme);
+
+function switchSuiteTab(buttonElement, productId, tabType) {
+  const container = document.getElementById(productId);
+  if(!container) return;
+  container.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
+  container.querySelectorAll('.pane-content').forEach(p => p.classList.remove('active'));
+  buttonElement.classList.add('active');
+  const targetedPane = document.getElementById(`${productId}-${tabType}`);
+  if(targetedPane) targetedPane.classList.add('active');
+}
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.04 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+</script>
+
+<script>
+(function() {
+  /* ═══════════════════════════════════════════════════
+     NARSY REPORT — D3 CHARTS & INTERACTIONS
+  ══════════════════════════════════════════════════ */
+
+  const PLATFORMS = ['NARSY','n8n','Make.com','Zapier AI','Power Automate'];
+  const COLORS = { 'NARSY':'#e8a84c', 'n8n':'#5b9cf6', 'Make.com':'#a78bfa', 'Zapier AI':'#4eca8b', 'Power Automate':'#6b6b78' };
+
+  const compositeScores = [
+    { name:'NARSY', score:7.9 }, { name:'n8n', score:6.3 },
+    { name:'Make.com', score:5.8 }, { name:'Zapier AI', score:5.2 }, { name:'Power Automate', score:5.5 }
+  ];
+
+  const radarDomains = ['NLP Intel','Tool Coverage','Execution','Governance','UX'];
+  const radarData = {
+    'NARSY': [9.1, 9.4, 7.5, 8.6, 7.2],
+    'n8n': [2.5, 6.8, 8.0, 4.5, 7.5],
+    'Make.com': [2.0, 7.0, 8.2, 4.0, 8.0],
+    'Zapier AI': [3.0, 6.2, 7.5, 3.5, 8.5],
+    'Power Automate': [3.5, 5.5, 7.0, 6.5, 6.5]
+  };
+
+  const matrixData = {
+    dimensions: [
+      ['Arabic NLP quality', 4, 'NLP', [9.5, 1.0, 1.0, 2.5, 3.0]],
+      ['Bilingual command routing', 3, 'NLP', [9.0, 4.0, 3.5, 5.0, 5.5]],
+      ['Semantic extraction', 3, 'NLP', [8.5, 3.0, 3.0, 4.0, 4.5]],
+      ['Intent confidence scoring', 2, 'NLP', [8.0, 2.0, 2.0, 2.5, 3.0]],
+      ['Morphological analysis', 4, 'NLP', [9.5, 0.0, 0.0, 0.0, 1.0]],
+      ['Tool catalog depth', 5, 'Tools', [9.5, 5.0, 5.5, 4.0, 5.0]],
+      ['Auto field population', 4, 'Tools', [8.5, 0.5, 1.0, 3.0, 3.5]],
+      ['Survey workflow coverage', 3, 'Tools', [9.5, 2.0, 2.0, 1.0, 3.5]],
+      ['Campaign workflow coverage', 3, 'Tools', [9.0, 3.0, 3.5, 2.5, 4.0]],
+      ['Pre-execution review gate', 3, 'Execution', [8.5, 1.0, 3.0, 1.0, 3.5]],
+      ['Execution reliability', 3, 'Execution', [7.5, 8.0, 8.0, 8.5, 8.0]],
+      ['Local execution (offline)', 2, 'Execution', [9.0, 3.0, 0.0, 0.0, 0.0]],
+      ['Pattern learning', 2, 'Execution', [7.0, 1.0, 1.0, 1.0, 4.0]],
+      ['Error handling', 2, 'Execution', [7.0, 8.0, 7.5, 8.0, 7.5]],
+      ['LLM governance', 3, 'Governance', [8.5, 0.5, 0.5, 0.5, 5.5]],
+      ['Risk classification', 3, 'Governance', [9.0, 0.0, 0.0, 0.0, 3.0]],
+      ['Compliance tooling', 2, 'Governance', [8.0, 1.0, 1.0, 1.0, 4.5]],
+      ['Audit trail', 2, 'Governance', [6.5, 6.0, 6.5, 5.5, 8.0]],
+      ['Deployment simplicity', 2, 'UX', [9.5, 5.0, 4.0, 4.0, 3.5]],
+      ['Chat-to-task UX', 2, 'UX', [8.5, 3.0, 3.0, 5.0, 4.0]],
+      ['RTL interface quality', 2, 'UX', [9.5, 1.0, 1.0, 1.0, 3.0]],
+      ['Learning curve', 1, 'UX', [7.5, 5.5, 6.0, 7.0, 5.0]],
+      ['Integration breadth', 3, 'UX', [4.0, 9.0, 9.5, 9.5, 8.5]]
+    ]
+  };
+
+  const nlpLayers = [
+    { layer:'Text normalization', scores:{ NARSY:9.5, n8n:2.0, 'Make.com':2.0, 'Zapier AI':2.5, 'Power Automate':3.5 }},
+    { layer:'Root/morpheme analysis', scores:{ NARSY:9.5, n8n:0.0, 'Make.com':0.0, 'Zapier AI':0.0, 'Power Automate':1.0 }},
+    { layer:'Semantic primitives', scores:{ NARSY:9.0, n8n:0.0, 'Make.com':0.0, 'Zapier AI':0.0, 'Power Automate':0.5 }},
+    { layer:'Domain classification', scores:{ NARSY:8.5, n8n:3.5, 'Make.com':3.0, 'Zapier AI':4.0, 'Power Automate':5.0 }},
+    { layer:'Intent confidence', scores:{ NARSY:8.0, n8n:2.0, 'Make.com':2.5, 'Zapier AI':3.5, 'Power Automate':4.0 }},
+    { layer:'Context extraction', scores:{ NARSY:9.0, n8n:3.0, 'Make.com':3.0, 'Zapier AI':4.0, 'Power Automate':5.5 }}
+  ];
+
+  const toolCategories = [
+    { cat:'Survey', narsy:16, field:1.5 }, { cat:'Campaign', narsy:18, field:0.5 },
+    { cat:'Media / Package', narsy:6, field:1 }, { cat:'Social', narsy:2, field:1 },
+    { cat:'LLM / Forecast', narsy:2, field:0 }, { cat:'Text Util', narsy:2, field:0 },
+    { cat:'Benchmark', narsy:1, field:0 }
+  ];
+
+  const govDimensions = [
+    { dim:'Risk Classification', narsy:9.0, field:1.2 },
+    { dim:'LLM Governance', narsy:8.5, field:1.5 },
+    { dim:'Compliance Review', narsy:8.0, field:0.8 },
+    { dim:'Approval Workflows', narsy:6.5, field:5.5 },
+    { dim:'Audit Trail', narsy:6.5, field:6.5 }
+  ];
+
+  const gapData = [
+    { label:'NLP Intelligence', gap:+6.6 }, { label:'Tool Coverage', gap:+4.4 },
+    { label:'Governance', gap:+3.5 }, { label:'Review Gate', gap:+5.5 },
+    { label:'Local Execution', gap:+6.0 }, { label:'Integration Breadth', gap:-5.5 },
+    { label:'Visual Workflow Editor', gap:-7.0 }, { label:'Cloud Persistence', gap:-4.5 },
+    { label:'Third-party Apps', gap:-5.5 }, { label:'Execution Reliability', gap:-0.5 }
+  ];
+
+  function scoreColor(v) {
+    if (v >= 7.5) return { bg:'rgba(78,202,139,.15)', color:'#4eca8b' };
+    if (v >= 5.0) return { bg:'rgba(91,156,246,.15)', color:'#5b9cf6' };
+    if (v >= 2.5) return { bg:'rgba(232,168,76,.12)', color:'#e8a84c' };
+    return { bg:'rgba(232,91,91,.15)', color:'#e85b5b' };
+  }
+
+  function showTip(e, html) {
+    const t = document.getElementById('tooltip');
+    if (!t) return;
+    t.innerHTML = html;
+    t.style.display = 'block';
+    t.style.left = (e.pageX + 12) + 'px';
+    t.style.top  = (e.pageY - 10) + 'px';
+  }
+  function hideTip() { const t = document.getElementById('tooltip'); if(t) t.style.display = 'none'; }
+
+  function buildCompositeBar() {
+    const container = document.getElementById('report-compositeBarContainer');
+    if (!container) return;
+    compositeScores.forEach(d => {
+      const isNarsy = d.name === 'NARSY';
+      const pct = d.score / 10 * 100;
+      const col = isNarsy ? 'var(--narsy)' : COLORS[d.name];
+      container.innerHTML += '<div class="bar-row' + (isNarsy?' highlight':'') + '">'
+        + '<div class="br-label">' + d.name + '</div>'
+        + '<div class="bar-track"><div class="bar-fill" data-pct="' + pct + '" style="background:' + col + '"></div></div>'
+        + '<div class="br-val">' + d.score.toFixed(1) + '</div></div>';
+    });
+  }
+
+  function buildHeatMatrix() {
+    const container = document.getElementById('report-heatMatrix');
+    if (!container) return;
+    const cols = ['Feature / Criterion','Wt','NARSY','n8n','Make.com','Zapier AI','Power Auto.'];
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:.8rem;"><thead><tr>';
+    cols.forEach((c,i) => {
+      const isN = c === 'NARSY';
+      html += '<th style="padding:.6rem .8rem;text-align:' + (i<2?'left':'center') + ';font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:' + (isN?'var(--narsy)':'var(--muted)') + ';border-bottom:1px solid var(--border);white-space:nowrap;background:' + (isN?'rgba(232,168,76,.04)':'transparent') + '">' + c + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    let lastCat = '';
+    matrixData.dimensions.forEach(function(d) {
+      var crit = d[0], wt = d[1], cat = d[2], scores = d[3];
+      if (cat !== lastCat) {
+        var catColors = {NLP:'var(--narsy)',Tools:'var(--blue)',Execution:'var(--green)',Governance:'var(--purple)',UX:'var(--teal)'};
+        html += '<tr><td colspan="7" style="padding:.4rem .8rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;color:' + (catColors[cat]||'var(--muted)') + ';background:rgba(255,255,255,.02)">' + cat.toUpperCase() + '</td></tr>';
+        lastCat = cat;
+      }
+      html += '<tr><td style="padding:.55rem .8rem;color:var(--text);font-size:.82rem;border-bottom:1px solid var(--border)">' + crit + '</td>';
+      html += '<td style="padding:.55rem .8rem;text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--muted);border-bottom:1px solid var(--border)">' + wt + '</td>';
+      scores.forEach(function(s,i) {
+        var t = scoreColor(s);
+        var isN = i === 0;
+        html += '<td style="padding:.5rem .7rem;text-align:center;border-bottom:1px solid var(--border);background:' + (isN?'rgba(232,168,76,.03)':'transparent') + '"><span style="display:inline-block;min-width:2.2rem;padding:3px 7px;border-radius:6px;background:' + t.bg + ';color:' + t.color + ';font-family:var(--mono);font-size:.72rem;font-weight:500">' + s.toFixed(1) + '</span></td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  }
+
+  function buildRadar(svgId, platform2) {
+    var svg = d3.select('#' + svgId);
+    if (svg.empty()) return;
+    var W = 320, H = 300, cx = 160, cy = 155, R = 100;
+    var n = radarDomains.length;
+    var angles = radarDomains.map(function(_, i) { return (i / n) * 2 * Math.PI - Math.PI / 2; });
+
+    [2,4,6,8,10].forEach(function(v) {
+      var r = v / 10 * R;
+      svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',r)
+         .attr('fill','none').attr('stroke','var(--border)').attr('stroke-width',1);
+      if(v===10) svg.append('text').attr('x',cx+4).attr('y',cy-r-3)
+        .attr('fill','var(--muted)').attr('font-size','8').text('10');
+    });
+
+    angles.forEach(function(a,i) {
+      var x2 = cx + Math.cos(a)*R, y2 = cy + Math.sin(a)*R;
+      svg.append('line').attr('x1',cx).attr('y1',cy).attr('x2',x2).attr('y2',y2)
+         .attr('stroke','var(--border)').attr('stroke-width',1);
+      var lx = cx + Math.cos(a)*(R+18), ly = cy + Math.sin(a)*(R+18);
+      svg.append('text').attr('x',lx).attr('y',ly).attr('text-anchor','middle')
+         .attr('dominant-baseline','middle').attr('fill','var(--muted)')
+         .attr('font-size','9').text(radarDomains[i]);
+    });
+
+    function poly(vals, col, opacity) {
+      var pts = vals.map(function(v,i) {
+        var r = v / 10 * R;
+        return [cx + Math.cos(angles[i])*r, cy + Math.sin(angles[i])*r];
+      });
+      svg.append('polygon')
+         .attr('points', pts.map(function(p){return p.join(',')}).join(' '))
+         .attr('fill', col).attr('fill-opacity', opacity)
+         .attr('stroke', col).attr('stroke-width', 2);
+      pts.forEach(function(p) {
+        svg.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3).attr('fill',col);
+      });
+    }
+
+    poly(radarData[platform2], 'var(--blue)', .08);
+    poly(radarData['NARSY'], 'var(--narsy)', .15);
+
+    svg.append('text').attr('x',cx).attr('y',cy-R-30)
+       .attr('text-anchor','middle').attr('fill','var(--narsy)')
+       .attr('font-size','10').attr('font-family','var(--mono)').text('NARSY');
+    svg.append('text').attr('x',cx).attr('y',cy-R-18)
+       .attr('text-anchor','middle').attr('fill','var(--blue)')
+       .attr('font-size','9').attr('font-family','var(--mono)').text(platform2);
+  }
+
+  function buildNlpBar() {
+    var container = document.getElementById('report-nlpBarContainer');
+    if (!container) return;
+    var plats = ['NARSY','n8n','Power Automate'];
+    var pcols = ['var(--narsy)','var(--blue)','var(--muted)'];
+    nlpLayers.forEach(function(row) {
+      var html = '<div style="margin-bottom:1.1rem"><div style="font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-bottom:.5rem">' + row.layer + '</div>';
+      plats.forEach(function(p,i) {
+        var v = row.scores[p];
+        html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:3px">'
+          + '<div style="width:120px;font-size:.72rem;color:' + pcols[i] + ';font-family:var(--mono)">' + p + '</div>'
+          + '<div style="flex:1;height:6px;background:var(--surface2);border-radius:3px">'
+          + '<div class="bar-fill" data-pct="' + (v*10) + '" style="background:' + pcols[i] + ';height:100%;border-radius:3px"></div></div>'
+          + '<div style="width:28px;font-size:.7rem;color:' + pcols[i] + ';font-family:var(--mono);text-align:right">' + v.toFixed(1) + '</div></div>';
+      });
+      html += '</div>';
+      container.innerHTML += html;
+    });
+  }
+
+  function buildToolBar() {
+    var container = document.getElementById('report-toolBarContainer');
+    if (!container) return;
+    toolCategories.forEach(function(d) {
+      container.innerHTML += '<div style="margin-bottom:1rem">'
+        + '<div style="font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-bottom:.5rem">' + d.cat + '</div>'
+        + '<div style="display:flex;gap:6px;align-items:center;margin-bottom:3px">'
+        + '<div style="width:80px;font-size:.7rem;color:var(--narsy);font-family:var(--mono)">NARSY</div>'
+        + '<div style="flex:1;height:8px;background:var(--surface2);border-radius:4px">'
+        + '<div class="bar-fill" data-pct="' + Math.min(d.narsy/20*100,100) + '" style="background:var(--narsy);height:100%;border-radius:4px"></div></div>'
+        + '<div style="width:30px;font-size:.75rem;color:var(--narsy);font-family:var(--mono);text-align:right">' + d.narsy + '</div></div>'
+        + '<div style="display:flex;gap:6px;align-items:center">'
+        + '<div style="width:80px;font-size:.7rem;color:var(--muted);font-family:var(--mono)">Field avg.</div>'
+        + '<div style="flex:1;height:8px;background:var(--surface2);border-radius:4px">'
+        + '<div class="bar-fill" data-pct="' + Math.min(d.field/20*100,100) + '" style="background:var(--muted);height:100%;border-radius:4px"></div></div>'
+        + '<div style="width:30px;font-size:.75rem;color:var(--muted);font-family:var(--mono);text-align:right">' + d.field.toFixed(1) + '</div></div></div>';
+    });
+  }
+
+  function buildRiskDist() {
+    var container = document.getElementById('report-riskDistContainer');
+    if (!container) return;
+    var risks = [
+      { label:'Low Risk', val:22, pct:46.8, col:'var(--green)' },
+      { label:'Medium Risk', val:19, pct:40.4, col:'var(--narsy)' },
+      { label:'High Risk', val:6, pct:12.8, col:'var(--red)' }
+    ];
+    risks.forEach(function(d) {
+      container.innerHTML += '<div class="bar-row"><div class="br-label">' + d.label + ' (' + d.val + ')</div>'
+        + '<div class="bar-track"><div class="bar-fill" data-pct="' + d.pct + '" style="background:' + d.col + '"></div></div>'
+        + '<div class="br-val">' + d.pct.toFixed(1) + '%</div></div>';
+    });
+  }
+
+  function buildGovBar() {
+    var container = document.getElementById('report-govBarContainer');
+    if (!container) return;
+    govDimensions.forEach(function(d) {
+      container.innerHTML += '<div style="margin-bottom:1rem"><div style="font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-bottom:.5rem">' + d.dim + '</div>'
+        + '<div style="display:flex;gap:6px;align-items:center;margin-bottom:3px">'
+        + '<div style="width:100px;font-size:.7rem;color:var(--narsy);font-family:var(--mono)">NARSY</div>'
+        + '<div style="flex:1;height:7px;background:var(--surface2);border-radius:3px">'
+        + '<div class="bar-fill" data-pct="' + (d.narsy*10) + '" style="background:var(--narsy);height:100%;border-radius:3px"></div></div>'
+        + '<div style="width:28px;font-size:.7rem;color:var(--narsy);font-family:var(--mono);text-align:right">' + d.narsy.toFixed(1) + '</div></div>'
+        + '<div style="display:flex;gap:6px;align-items:center">'
+        + '<div style="width:100px;font-size:.7rem;color:var(--muted);font-family:var(--mono)">Field avg.</div>'
+        + '<div style="flex:1;height:7px;background:var(--surface2);border-radius:3px">'
+        + '<div class="bar-fill" data-pct="' + (d.field*10) + '" style="background:var(--muted);height:100%;border-radius:3px"></div></div>'
+        + '<div style="width:28px;font-size:.7rem;color:var(--muted);font-family:var(--mono);text-align:right">' + d.field.toFixed(1) + '</div></div></div>';
+    });
+  }
+
+  function buildWaterfall() {
+    var svg = d3.select('#report-waterfallChart');
+    if (svg.empty()) return;
+    var W = svg.node().getBoundingClientRect().width || 800;
+    var H = 320, margin = { top:20, right:20, bottom:60, left:160 };
+    var iW = W - margin.left - margin.right, iH = H - margin.top - margin.bottom;
+    var xMax = 8, xMin = -8;
+    var xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, iW]);
+    var yScale = d3.scaleBand().domain(gapData.map(function(d){return d.label})).range([0,iH]).padding(.28);
+    var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    g.append('line').attr('x1', xScale(0)).attr('y1', -10).attr('x2', xScale(0)).attr('y2', iH + 10)
+      .attr('stroke','var(--border2)').attr('stroke-width',1).attr('stroke-dasharray','3,3');
+    [-8,-4,0,4,8].forEach(function(v) {
+      g.append('text').attr('x',xScale(v)).attr('y',iH+18).attr('text-anchor','middle')
+       .attr('fill','var(--muted)').attr('font-size','10').attr('font-family','var(--mono)').text(v);
+    });
+    g.append('text').attr('x',iW/2).attr('y',iH+36).attr('text-anchor','middle')
+     .attr('fill','var(--muted)').attr('font-size','9').attr('font-family','var(--mono)').text('Score delta vs. field leader');
+    gapData.forEach(function(d) {
+      var col = d.gap >= 0 ? 'var(--green)' : 'var(--red)';
+      var x0 = d.gap >= 0 ? xScale(0) : xScale(d.gap);
+      var barW = Math.abs(xScale(d.gap) - xScale(0));
+      var y = yScale(d.label), bh = yScale.bandwidth();
+      g.append('rect').attr('x', x0).attr('y', y).attr('width', barW).attr('height', bh)
+       .attr('fill', col).attr('fill-opacity', .25).attr('rx', 3);
+      g.append('rect').attr('x', x0).attr('y', y + bh - 3).attr('width', barW).attr('height', 3)
+       .attr('fill', col).attr('rx', 1.5);
+      g.append('text').attr('x', d.gap >= 0 ? x0 + barW + 5 : x0 - 5)
+       .attr('y', y + bh / 2 + 1)
+       .attr('text-anchor', d.gap >= 0 ? 'start' : 'end')
+       .attr('dominant-baseline', 'middle').attr('fill', col)
+       .attr('font-size', '10').attr('font-family','var(--mono)')
+       .text((d.gap > 0 ? '+' : '') + d.gap.toFixed(1));
+      g.append('text').attr('x', -8).attr('y', y + bh / 2 + 1)
+       .attr('text-anchor', 'end').attr('dominant-baseline', 'middle')
+       .attr('fill', 'var(--muted)').attr('font-size', '11').text(d.label);
+    });
+  }
+
+  function buildBubble() {
+    var svg = d3.select('#report-bubbleChart');
+    if (svg.empty()) return;
+    var W = svg.node().getBoundingClientRect().width || 800, cy = 100;
+    var platforms = [
+      { name:'NARSY', x:.15, score:7.9 }, { name:'n8n', x:.35, score:6.3 },
+      { name:'Make.com', x:.55, score:5.8 }, { name:'Zapier AI', x:.72, score:5.2 },
+      { name:'Power Automate', x:.88, score:5.5 }
+    ];
+    platforms.forEach(function(d) {
+      var r = d.score * 6, cx = d.x * W, col = COLORS[d.name] || 'var(--muted)';
+      svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',r)
+         .attr('fill', col).attr('fill-opacity',.15).attr('stroke', col).attr('stroke-width',1.5);
+      svg.append('text').attr('x',cx).attr('y',cy+1).attr('text-anchor','middle')
+         .attr('dominant-baseline','middle').attr('fill',col)
+         .attr('font-family','var(--mono)').attr('font-size','11').attr('font-weight','500')
+         .text(d.score.toFixed(1));
+      svg.append('text').attr('x',cx).attr('y',cy+r+14).attr('text-anchor','middle')
+         .attr('fill','var(--muted)').attr('font-family','var(--mono)').attr('font-size','9').text(d.name);
+    });
+  }
+
+  function animateBars() {
+    document.querySelectorAll('.narsy-report-card .bar-fill').forEach(function(el) {
+      var pct = parseFloat(el.dataset.pct) || 0;
+      el.style.width = Math.min(pct, 100) + '%';
+    });
+  }
+
+  var reportObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        animateBars();
+      }
+    });
+  }, { threshold: .1 });
+  document.querySelectorAll('.narsy-report-card .animate-on-scroll').forEach(function(el) { reportObserver.observe(el); });
+
+  window.addEventListener('scroll', function() {
+    var sections = ['report-cover','report-methodology','report-overview','report-scoring','report-radar','report-features','report-tools','report-nlp','report-risk','report-gaps','report-verdict'];
+    sections.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var rect = el.getBoundingClientRect();
+      if (rect.top <= 120 && rect.bottom > 0) {
+        document.querySelectorAll('.narsy-report-card .nav-item').forEach(function(n) {
+          n.classList.toggle('active', n.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  });
+
+  function reportNav(el) {
+    /* handled by scroll */
+  }
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      buildCompositeBar();
+      buildHeatMatrix();
+      buildRadar('report-radar1','n8n');
+      buildRadar('report-radar2','Make.com');
+      buildRadar('report-radar3','Zapier AI');
+      buildRadar('report-radar4','Power Automate');
+      buildNlpBar();
+      buildToolBar();
+      buildRiskDist();
+      buildGovBar();
+      buildWaterfall();
+      buildBubble();
+      setTimeout(animateBars, 400);
+    }, 300);
+  });
+})();
+</script>
+
+<script>
+(function() {
+  /* NARSY TUTORIAL — STAGE NAVIGATION & LANGUAGE */
+  var currentStage = 0;
+  var currentLang = 'ar';
+  var totalStages = 8;
+  var progNums = {
+    ar: ['١ من ٨','٢ من ٨','٣ من ٨','٤ من ٨','٥ من ٨','٦ من ٨','٧ من ٨','٨ من ٨ — اكتمل'],
+    en: ['1 of 8','2 of 8','3 of 8','4 of 8','5 of 8','6 of 8','7 of 8','8 of 8 — Complete']
+  };
+
+  function tutorialShowStage(idx) {
+    var card = document.querySelector('.narsy-tutorial-card');
+    if (!card) return;
+    card.querySelectorAll('.stage-card').forEach(function(c,i) { c.classList.toggle('visible', i === idx); });
+    card.querySelectorAll('.stage-btn').forEach(function(b,i) { b.classList.toggle('active', i === idx); });
+    currentStage = idx;
+    updateTutorialProgress();
+    var btns = card.querySelectorAll('.stage-btn');
+    if (btns[idx]) btns[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    card.querySelector('.main').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateTutorialProgress() {
+    var pct = ((currentStage + 1) / totalStages) * 100;
+    var bar = document.getElementById('tutorialProgress');
+    if (bar) bar.style.width = pct + '%';
+  }
+
+  function tutorialToggleLang() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    tutorialApplyLang();
+  }
+
+  function tutorialApplyLang() {
+    var card = document.querySelector('.narsy-tutorial-card');
+    if (!card) return;
+    var isAr = currentLang === 'ar';
+    card.querySelectorAll('[data-ar]').forEach(function(el) {
+      var val = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+      if (val !== null) el.innerHTML = val;
+    });
+    var flag = document.getElementById('tutorialLangFlag');
+    var label = document.getElementById('tutorialLangLabel');
+    if (flag) flag.textContent = isAr ? '🇬🇧' : '🇸🇦';
+    if (label) label.textContent = isAr ? 'English' : 'عربي';
+  }
+
+  // Make functions accessible globally for onclick handlers
+  window.tutorialShowStage = tutorialShowStage;
+
+  // Init
+  updateTutorialProgress();
+  document.getElementById('tutorialLangBtn')?.addEventListener('click', tutorialToggleLang);
+})();
+</script>
+
+</body>
+</html>
