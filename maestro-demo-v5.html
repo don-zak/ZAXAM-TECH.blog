@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Maestro — Interactive Governance Demo v5</title><style>html,body{margin:0;width:100%;height:100%;background:#050a12;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block;background:#050a12}</style></head><body><iframe id="maestroDemo" title="Maestro interactive governance demo" src="maestro-demo-v4.html?v=4-lifecycle-fix"></iframe><script>
+(function(){
+  const frame=document.getElementById('maestroDemo');
+  const lifecycleStages=[
+    ['Identity','Who or what is requesting the operation?'],
+    ['Authority','Has this actor been granted authority for this action?'],
+    ['Entitlement','Is the operational right admitted? Demo wording does not fabricate a commercial subscription.'],
+    ['Quota','Does the request remain inside the allowed usage boundary?'],
+    ['Capacity','Is runtime capacity available for the admitted operation?'],
+    ['Governance','What policy decision applies now?'],
+    ['Human Approval','Is a human boundary required for this specific action?'],
+    ['Execution','The external operation occurs only after all required prior gates admit it.'],
+    ['Evidence','Decision, approval, execution, and retained evidence remain separately reviewable.']
+  ];
+  const scenarioConfig={
+    control:{title:'SLA incident governance',decision:'CONTROL',desc:'Admissible action pauses at Human Approval.',path:['Identity','Authority','Entitlement','Quota','Capacity','Governance','Human Approval']},
+    repair:{title:'Provider degradation recovery',decision:'REPAIR',desc:'Qualified fallback skips Human Approval and preserves the same authority boundary.',path:['Identity','Authority','Entitlement','Quota','Capacity','Governance','Execution','Evidence']},
+    stop:{title:'Sensitive configuration change',decision:'STOP',desc:'Policy fails closed at Governance. Execution is never granted.',path:['Identity','Authority','Entitlement','Quota','Capacity','Governance']}
+  };
+  frame.addEventListener('load',()=>{
+    const doc=frame.contentDocument;
+    if(!doc)return;
+    const lifeFlow=doc.getElementById('lifeFlow');
+    const lifeDetail=doc.getElementById('lifeDetail');
+    if(lifeFlow&&lifeDetail){
+      lifeFlow.innerHTML='';
+      lifecycleStages.forEach(([label,detail],index)=>{
+        const button=doc.createElement('button');
+        button.type='button';button.className='lifeBtn';button.dataset.lifeStage=label;button.textContent=label;
+        lifeFlow.appendChild(button);
+        if(index===0){button.classList.add('active');lifeDetail.textContent=detail;}
+      });
+      lifeFlow.addEventListener('click',(event)=>{
+        const button=event.target.closest('[data-life-stage]');
+        if(!button||!lifeFlow.contains(button))return;
+        const stage=lifecycleStages.find(([label])=>label===button.dataset.lifeStage);
+        if(!stage)return;
+        lifeFlow.querySelectorAll('[data-life-stage]').forEach(item=>item.classList.toggle('active',item===button));
+        lifeDetail.textContent=stage[1];
+        lifeDetail.classList.add('show');
+      });
+      lifeFlow.dataset.lifecycleReady='true';
+    }
+
+    const journey=doc.getElementById('journey');
+    const run=doc.getElementById('scenarioRun');
+    const approve=doc.getElementById('scenarioApprove');
+    const reset=doc.getElementById('scenarioReset');
+    const decision=doc.getElementById('scenarioDecision');
+    const status=doc.getElementById('scenarioStatus');
+    const title=doc.getElementById('scenarioTitle');
+    const desc=doc.getElementById('scenarioDesc');
+    const rAuthority=doc.getElementById('rAuthority');
+    const rApproval=doc.getElementById('rApproval');
+    const rExecution=doc.getElementById('rExecution');
+    const rEvidence=doc.getElementById('rEvidence');
+    if(journey&&run&&approve&&reset){
+      let active='control';let token=0;
+      const steps=['Identity','Authority','Entitlement','Quota','Capacity','Governance','Human Approval','Execution','Evidence'];
+      function render(){
+        journey.innerHTML='';
+        steps.forEach((step,index)=>{const n=doc.createElement('div');n.className='jnode';n.dataset.step=step;n.innerHTML=`<div class="jcore">${String(index+1).padStart(2,'0')}</div><div class="jlabel">${step}</div>`;journey.appendChild(n)});
+        decision.textContent='Ready';status.textContent='Run the scenario to inspect its explicit path.';approve.style.display='none';
+        rAuthority.textContent='Not evaluated';rApproval.textContent='Not evaluated';rExecution.textContent='Not evaluated';rEvidence.textContent='Not evaluated';
+      }
+      doc.querySelectorAll('[data-scenario]').forEach(button=>{
+        button.onclick=()=>{active=button.dataset.scenario;token++;doc.querySelectorAll('[data-scenario]').forEach(x=>x.classList.toggle('active',x===button));title.textContent=scenarioConfig[active].title;desc.textContent=scenarioConfig[active].desc;render();};
+      });
+      run.onclick=async()=>{
+        const local=++token;render();const s=scenarioConfig[active];const used=new Set(s.path);
+        journey.querySelectorAll('.jnode').forEach(n=>{if(!used.has(n.dataset.step))n.classList.add('skipped')});
+        for(let i=0;i<s.path.length;i++){
+          if(local!==token)return;const n=journey.querySelector(`[data-step="${s.path[i]}"]`);if(!n)return;n.classList.add('active');await new Promise(r=>setTimeout(r,300));if(local!==token)return;n.classList.remove('active');if(i<s.path.length-1)n.classList.add('done');
+        }
+        const last=journey.querySelector(`[data-step="${s.path[s.path.length-1]}"]`);decision.textContent=s.decision;rAuthority.textContent='Admitted through evaluated gates';
+        if(active==='control'){status.textContent='Execution paused at Human Approval.';approve.style.display='inline-block';rApproval.textContent='Required';rExecution.textContent='Paused';rEvidence.textContent='Pending';}
+        else if(active==='repair'){last.classList.add('done');status.textContent='Qualified fallback executed → evidence retained.';rApproval.textContent='Not required';rExecution.textContent='Qualified fallback executed';rEvidence.textContent='Retained';}
+        else{last.classList.add('blocked');status.textContent='Fail closed → no execution granted.';rApproval.textContent='Not reached';rExecution.textContent='Denied';rEvidence.textContent='Decision retained';}
+      };
+      approve.onclick=async()=>{const local=++token;const approval=journey.querySelector('[data-step="Human Approval"]');if(approval){approval.classList.remove('active','skipped');approval.classList.add('done')}rApproval.textContent='Recorded';for(const id of ['Execution','Evidence']){const n=journey.querySelector(`[data-step="${id}"]`);if(!n)continue;n.classList.remove('skipped');n.classList.add('active');await new Promise(r=>setTimeout(r,320));if(local!==token)return;n.classList.remove('active');n.classList.add('done')}rExecution.textContent='Governed execution';rEvidence.textContent='Retained';status.textContent='Approval recorded → governed execution → evidence retained.';approve.style.display='none';};
+      reset.onclick=()=>{token++;render();};
+      render();journey.dataset.journeyReady='true';
+    }
+  });
+})();
+</script></body></html>
