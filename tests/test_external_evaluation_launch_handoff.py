@@ -17,8 +17,8 @@ class ExternalEvaluationLaunchHandoffTests(unittest.TestCase):
 
     def test_zaxam_does_not_persist_launch_or_api_credentials(self):
         source = self.source()
-        self.assertNotIn("localStorage", source)
-        self.assertNotIn("sessionStorage", source)
+        self.assertNotIn("localStorage.", source)
+        self.assertNotIn("sessionStorage.", source)
         self.assertIn("never written to localStorage/sessionStorage/cookies", source)
         self.assertIn("API key still required", source)
 
