@@ -16,10 +16,14 @@ class _IframeParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.iframes: list[dict[str, str | None]] = []
+        self.links: list[dict[str, str | None]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
         if tag == "iframe":
-            self.iframes.append(dict(attrs))
+            self.iframes.append(values)
+        if tag == "a":
+            self.links.append(values)
 
 
 class MaestroExternalEvaluationEmbedTests(unittest.TestCase):
@@ -29,6 +33,7 @@ class MaestroExternalEvaluationEmbedTests(unittest.TestCase):
         parser = _IframeParser()
         parser.feed(cls.html)
         cls.iframes = parser.iframes
+        cls.links = parser.links
 
     def test_canonical_site_origin_matches_backend_frame_allowlist_contract(self) -> None:
         self.assertEqual(CNAME.read_text(encoding="utf-8").strip(), "zaxam.net")
@@ -59,6 +64,43 @@ class MaestroExternalEvaluationEmbedTests(unittest.TestCase):
         self.assertIn("production execution remains disabled", self.html)
         self.assertIn("fails closed rather than falling back to a mock execution path", self.html)
         self.assertIn("Authority issued → execution admitted → policy enforced → evidence produced.", self.html)
+        self.assertIn("Evaluation-ready, not production-certified", self.html)
+
+    def test_live_workspace_is_primary_and_demo_is_secondary(self) -> None:
+        live_position = self.html.index("Recommended · Live evaluation")
+        demo_position = self.html.index("No credentials · Deterministic")
+        workspace_position = self.html.index('id="external-evaluation"')
+        self.assertLess(live_position, demo_position)
+        self.assertLess(demo_position, workspace_position)
+        self.assertIn("Open workspace below", self.html)
+        self.assertIn("Launch interactive demo", self.html)
+
+    def test_customer_journey_and_quota_explanation_are_visible(self) -> None:
+        for marker in (
+            "1 · Connect",
+            "2 · Prepare",
+            "3 · Execute",
+            "4 · Prove",
+            "A fresh admitted execution consumes +1 quota.",
+            "Status reads, durable replay and idempotency conflict consume zero additional units.",
+            "Production execution and unsealed tasks or bindings remain blocked.",
+        ):
+            self.assertIn(marker, self.html)
+
+    def test_workspace_has_safe_separate_tab_fallback(self) -> None:
+        external_links = [
+            link for link in self.links if link.get("href") == EVALUATION_URL
+        ]
+        self.assertEqual(len(external_links), 1)
+        self.assertEqual(external_links[0].get("target"), "_blank")
+        rel = set((external_links[0].get("rel") or "").split())
+        self.assertIn("noopener", rel)
+        self.assertIn("noreferrer", rel)
+
+    def test_mobile_and_reduced_motion_ui_contracts_are_present(self) -> None:
+        self.assertIn("@media(max-width:620px)", self.html)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", self.html)
+        self.assertIn("height:clamp(760px,84vh,1040px)", self.html)
 
     def test_page_has_no_third_party_script_that_can_observe_parent_state(self) -> None:
         # The integration is an isolated iframe; the parent page intentionally has no script tag.
