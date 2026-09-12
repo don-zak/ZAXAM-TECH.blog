@@ -32,7 +32,19 @@ jobs:
       - name: Verify Maestro Demo v5 identity
         run: python -m unittest tests/test_maestro_demo_v5_identity.py -v
 
-      - name: Verify live Workspace framing headers
+      - name: Verify live ZAXAM launch wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://zaxam.net/external-evaluation.html"
+          body="$(mktemp)"
+          status="$(curl --silent --show-error --location --max-time 30 --output "$body" --write-out '%{http_code}' "$url")"
+          test "$status" = "200"
+          grep -Fq 'evaluation-launch=' "$body"
+          grep -Fq 'API key still required' "$body"
+          grep -Fq 'Production disabled' "$body"
+
+      - name: Verify live Workspace launch gate and framing headers
         shell: bash
         run: |
           set -euo pipefail
@@ -43,12 +55,8 @@ jobs:
           tr -d '\r' < "$headers" > "${headers}.normalized"
           cat "${headers}.normalized"
 
-          # Transitional assertion: current live service may still return 200
-          # until the launch-gate branch is deployed. After deployment, direct
-          # top-level navigation is expected to return 403. Both states must
-          # retain the scoped framing/privacy headers during rollout.
-          if [[ "$status" != "200" && "$status" != "403" ]]; then
-            echo "Unexpected workspace status: $status" >&2
+          if [[ "$status" != "403" ]]; then
+            echo "Direct top-level workspace navigation must fail closed with 403; got $status" >&2
             exit 1
           fi
 
