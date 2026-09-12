@@ -2,6 +2,8 @@ name: Deploy ZAXAM-TECH to GitHub Pages
 
 on:
   push:
+    branches: ["main", "feat/maestro-external-evaluation-workspace"]
+  pull_request:
     branches: ["main"]
   workflow_dispatch:
 
@@ -11,11 +13,42 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Maestro External Evaluation boundary
+        run: python -m unittest tests/test_maestro_external_evaluation_embed.py -v
+
+      - name: Verify live Workspace framing headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://processual-maestro-external-evaluation.onrender.com/console/evaluation.html"
+          headers="$(mktemp)"
+          curl --fail --silent --show-error --location --max-time 30 --dump-header "$headers" --output /dev/null "$url"
+
+          tr -d '\r' < "$headers" > "${headers}.normalized"
+          cat "${headers}.normalized"
+
+          grep -Eiq '^content-security-policy:[[:space:]]*frame-ancestors https://zaxam\.net[[:space:]]*$' "${headers}.normalized"
+          grep -Eiq '^cache-control:.*no-store' "${headers}.normalized"
+          grep -Eiq '^referrer-policy:[[:space:]]*no-referrer[[:space:]]*$' "${headers}.normalized"
+
+          if grep -Eiq '^x-frame-options:' "${headers}.normalized"; then
+            echo "Workspace route must not emit X-Frame-Options; CSP frame-ancestors is the scoped authority." >&2
+            exit 1
+          fi
+
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: verify
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
