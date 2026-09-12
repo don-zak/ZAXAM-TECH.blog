@@ -26,6 +26,9 @@ jobs:
       - name: Verify Maestro External Evaluation boundary
         run: python -m unittest tests/test_maestro_external_evaluation_embed.py -v
 
+      - name: Verify Maestro Demo v5 identity
+        run: python -m unittest tests/test_maestro_demo_v5_identity.py -v
+
       - name: Verify live Workspace framing headers
         shell: bash
         run: |
