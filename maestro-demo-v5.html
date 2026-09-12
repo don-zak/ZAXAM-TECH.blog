@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Maestro — Interactive Governance Demo v5</title><style>html,body{margin:0;width:100%;height:100%;background:#050a12;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block;background:#050a12}</style></head><body><iframe id="maestroDemo" title="Maestro interactive governance demo" src="maestro-demo-v4.html?v=4-lifecycle-fix"></iframe><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Maestro — Interactive Governance Demo v5</title><style>html,body{margin:0;width:100%;height:100%;background:#050a12;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block;background:#050a12;visibility:hidden}iframe.ready{visibility:visible}</style></head><body data-maestro-demo-release="v5"><iframe id="maestroDemo" title="Maestro interactive governance demo v5" src="maestro-demo-v4.html?v=5-shell"></iframe><script>
 (function(){
   const frame=document.getElementById('maestroDemo');
   const lifecycleStages=[
@@ -17,9 +17,30 @@
     repair:{title:'Provider degradation recovery',decision:'REPAIR',desc:'Qualified fallback skips Human Approval and preserves the same authority boundary.',path:['Identity','Authority','Entitlement','Quota','Capacity','Governance','Execution','Evidence']},
     stop:{title:'Sensitive configuration change',decision:'STOP',desc:'Policy fails closed at Governance. Execution is never granted.',path:['Identity','Authority','Entitlement','Quota','Capacity','Governance']}
   };
+
+  function normalizeV5Identity(doc){
+    doc.title='Maestro — Interactive Governance Demo v5';
+    const sub=doc.querySelector('.sub');
+    if(sub){
+      sub.innerHTML='Interactive Governance Demo<br>Agentic Operations & Governance Control Plane<br>Public showcase · v5';
+    }
+    const walker=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode())nodes.push(walker.currentNode);
+    nodes.forEach((node)=>{
+      node.nodeValue=node.nodeValue
+        .replace(/Startup Tunisia\s*/gi,'')
+        .replace(/Public showcase\s*·\s*v4/gi,'Public showcase · v5')
+        .replace(/Interactive Governance Demo\s*v4/gi,'Interactive Governance Demo v5');
+    });
+    doc.documentElement.dataset.maestroDemoRelease='v5';
+  }
+
   frame.addEventListener('load',()=>{
     const doc=frame.contentDocument;
     if(!doc)return;
+    normalizeV5Identity(doc);
+
     const lifeFlow=doc.getElementById('lifeFlow');
     const lifeDetail=doc.getElementById('lifeDetail');
     if(lifeFlow&&lifeDetail){
@@ -81,6 +102,7 @@
       reset.onclick=()=>{token++;render();};
       render();journey.dataset.journeyReady='true';
     }
+    frame.classList.add('ready');
   });
 })();
 </script></body></html>
