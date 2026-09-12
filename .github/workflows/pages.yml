@@ -26,6 +26,9 @@ jobs:
       - name: Verify Maestro External Evaluation boundary
         run: python -m unittest tests/test_maestro_external_evaluation_embed.py -v
 
+      - name: Verify External Evaluation launch handoff
+        run: python -m unittest tests/test_external_evaluation_launch_handoff.py -v
+
       - name: Verify Maestro Demo v5 identity
         run: python -m unittest tests/test_maestro_demo_v5_identity.py -v
 
@@ -35,10 +38,19 @@ jobs:
           set -euo pipefail
           url="https://processual-maestro-external-evaluation.onrender.com/console/evaluation.html"
           headers="$(mktemp)"
-          curl --fail --silent --show-error --location --max-time 30 --dump-header "$headers" --output /dev/null "$url"
+          status="$(curl --silent --show-error --max-time 30 --dump-header "$headers" --output /dev/null --write-out '%{http_code}' "$url")"
 
           tr -d '\r' < "$headers" > "${headers}.normalized"
           cat "${headers}.normalized"
+
+          # Transitional assertion: current live service may still return 200
+          # until the launch-gate branch is deployed. After deployment, direct
+          # top-level navigation is expected to return 403. Both states must
+          # retain the scoped framing/privacy headers during rollout.
+          if [[ "$status" != "200" && "$status" != "403" ]]; then
+            echo "Unexpected workspace status: $status" >&2
+            exit 1
+          fi
 
           grep -Eiq '^content-security-policy:[[:space:]]*frame-ancestors https://zaxam\.net[[:space:]]*$' "${headers}.normalized"
           grep -Eiq '^cache-control:.*no-store' "${headers}.normalized"
