@@ -6,6 +6,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 MAESTRO = ROOT / "maestro.html"
+CNAME = ROOT / "CNAME"
+CANONICAL_ZAXAM_ORIGIN = "https://zaxam.net"
 EVALUATION_ORIGIN = "https://processual-maestro-external-evaluation.onrender.com"
 EVALUATION_URL = f"{EVALUATION_ORIGIN}/console/evaluation.html"
 
@@ -27,6 +29,10 @@ class MaestroExternalEvaluationEmbedTests(unittest.TestCase):
         parser = _IframeParser()
         parser.feed(cls.html)
         cls.iframes = parser.iframes
+
+    def test_canonical_site_origin_matches_backend_frame_allowlist_contract(self) -> None:
+        self.assertEqual(CNAME.read_text(encoding="utf-8").strip(), "zaxam.net")
+        self.assertEqual(CANONICAL_ZAXAM_ORIGIN, "https://zaxam.net")
 
     def test_exactly_one_governed_evaluation_iframe_is_present(self) -> None:
         self.assertEqual(len(self.iframes), 1)
